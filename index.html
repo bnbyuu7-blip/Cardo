@@ -1,0 +1,4617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FedChain — Virtual Card</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#06131f;
+  --surface:#0b202e;
+  --surface2:#0d2535;
+  --surface3:#0f2c3e;
+  --border:#193b4d;
+  --border2:#1f4d62;
+  --border3:#255870;
+  --accent:#00bd82;
+  --accent2:#087b61;
+  --accent-glow:rgba(0,189,130,.25);
+  --muted:#8da4b2;
+  --muted2:#5f7f90;
+  --danger:#e05252;
+  --warn:#f0a940;
+  --info:#4ab4e8;
+  --text:#fff;
+  --radius:17px;
+  --radius-sm:11px;
+}
+
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:24px 16px 80px;
+}
+
+.app{
+  width:100%;
+  max-width:430px;
+}
+
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* =========================
+   SVG ICON SYSTEM
+========================= */
+.svg-icon{
+  width:21px;
+  height:21px;
+  display:inline-block;
+  vertical-align:middle;
+}
+
+.svg-icon.sm{
+  width:17px;
+  height:17px;
+}
+
+.svg-icon.lg{
+  width:26px;
+  height:26px;
+}
+
+.icon-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* =========================
+   LOGO
+========================= */
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:26px;
+}
+
+.logo-svg{
+  width:42px;
+  height:42px;
+  flex-shrink:0;
+}
+
+.logo-text{
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.logo-sub{
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:1.5px;
+  font-weight:700;
+}
+
+/* =========================
+   CARD BOX
+========================= */
+.card-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px 20px;
+  margin-bottom:18px;
+}
+
+.card-box h2{
+  font-size:19px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.card-box .sub{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:20px;
+  line-height:1.5;
+}
+
+/* =========================
+   FIELDS
+========================= */
+.field{margin-bottom:13px;}
+
+.field label{
+  display:block;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.2px;
+  color:var(--muted);
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+
+.field input{
+  width:100%;
+  padding:13px 14px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border2);
+  background:#071924;
+  color:#fff;
+  outline:none;
+  font-size:14px;
+  transition:border-color .2s;
+}
+
+.field input:focus{
+  border-color:var(--accent);
+}
+
+.field input::placeholder{
+  color:var(--muted2);
+}
+
+.phone-row{
+  display:flex;
+  gap:8px;
+}
+
+.flag-pre{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:#071924;
+  border:1px solid var(--border2);
+  border-radius:var(--radius-sm);
+  padding:0 12px;
+  font-size:14px;
+  white-space:nowrap;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.phone-row .field{
+  flex:1;
+  margin-bottom:0;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn{
+  width:100%;
+  border:none;
+  border-radius:var(--radius-sm);
+  padding:14px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  letter-spacing:.3px;
+}
+
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;
+  box-shadow:0 4px 16px var(--accent-glow);
+}
+
+.btn-primary:hover{
+  background:linear-gradient(135deg,#00d695,#098c6d);
+}
+
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--muted);
+}
+
+.btn-ghost:hover{
+  background:var(--surface2);
+}
+
+.btn-danger{
+  background:transparent;
+  border:1px solid rgba(224,82,82,.35);
+  color:#e8a0a0;
+}
+
+.btn-sm{
+  padding:9px 15px;
+  font-size:12px;
+  width:auto;
+}
+
+/* =========================
+   MSG
+========================= */
+.msg{
+  font-size:12px;
+  margin-top:11px;
+  text-align:center;
+  min-height:17px;
+  line-height:1.5;
+}
+
+.msg.error{color:var(--danger);}
+.msg.success{color:var(--accent);}
+.msg.info{color:var(--muted);}
+
+/* =========================
+   LINK
+========================= */
+.link-row{
+  text-align:center;
+  margin-top:16px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.link-row a{
+  color:var(--accent);
+  cursor:pointer;
+  font-weight:600;
+}
+
+/* =========================
+   OTP
+========================= */
+.otp-hint{
+  background:rgba(0,189,130,.07);
+  border:1px solid rgba(0,189,130,.2);
+  border-radius:10px;
+  padding:12px 14px;
+  font-size:12px;
+  color:var(--accent);
+  margin-bottom:16px;
+  line-height:1.6;
+}
+
+.otp-hint .otp-code-display{
+  background:#071924;
+  border:1px solid rgba(0,189,130,.3);
+  border-radius:8px;
+  padding:10px;
+  margin-top:8px;
+  text-align:center;
+  font-family:monospace;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:3px;
+  color:var(--accent);
+  word-break:break-all;
+}
+
+.otp-row{
+  display:flex;
+  gap:9px;
+  justify-content:center;
+  margin-bottom:6px;
+}
+
+.otp-row input{
+  width:44px;
+  height:52px;
+  border-radius:10px;
+  border:1px solid var(--border2);
+  background:#071924;
+  color:#fff;
+  font-size:21px;
+  font-weight:700;
+  text-align:center;
+  outline:none;
+}
+
+.otp-row input:focus{
+  border-color:var(--accent);
+}
+
+.resend-row{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:9px;
+}
+
+.resend-row a{
+  color:var(--accent);
+  cursor:pointer;
+}
+
+/* =========================
+   TOAST
+========================= */
+#toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#0f2c3e;
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:11px 20px;
+  font-size:13px;
+  font-weight:600;
+  color:#fff;
+  z-index:999;
+  transition:transform .3s ease,opacity .3s;
+  opacity:0;
+  white-space:nowrap;
+  box-shadow:0 8px 28px rgba(0,0,0,.5);
+}
+
+#toast.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+
+#toast.t-success{
+  border-color:rgba(0,189,130,.4);
+  color:var(--accent);
+}
+
+#toast.t-error{
+  border-color:rgba(224,82,82,.4);
+  color:#e8a0a0;
+}
+
+#toast.t-info{
+  border-color:rgba(74,180,232,.3);
+  color:var(--info);
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+.dash-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.dash-greet{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:2px;
+}
+
+.dash-name{
+  font-size:18px;
+  font-weight:700;
+}
+
+.logout-btn{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+.kyc-banner{
+  background:rgba(240,169,64,.07);
+  border:1px solid rgba(240,169,64,.25);
+  border-radius:13px;
+  padding:13px 16px;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  cursor:pointer;
+}
+
+.kyc-banner .kyc-icon{
+  width:24px;
+  height:24px;
+}
+
+.kyc-banner .kyc-text .kyc-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--warn);
+}
+
+.kyc-banner .kyc-text .kyc-sub{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.kyc-banner.verified{
+  background:rgba(0,189,130,.06);
+  border-color:rgba(0,189,130,.2);
+}
+
+.kyc-banner.verified .kyc-title{
+  color:var(--accent);
+}
+
+/* =========================
+   ACCOUNT
+========================= */
+.acct-pill{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px 16px;
+  margin-bottom:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.acct-label{
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:1px;
+  font-weight:700;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+
+.acct-num{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:2px;
+  font-family:monospace;
+}
+
+.copy-btn{
+  background:rgba(0,189,130,.1);
+  border:1px solid rgba(0,189,130,.2);
+  color:var(--accent);
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+/* =========================
+   BALANCE
+========================= */
+.balance-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 20px 14px;
+  margin-bottom:18px;
+}
+
+.bal-label{
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:.8px;
+  margin-bottom:5px;
+  font-weight:700;
+}
+
+.bal-amount{
+  font-size:31px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+
+.bal-amount .cur{
+  font-size:17px;
+  font-weight:600;
+  color:var(--muted);
+  margin-right:2px;
+}
+
+.bal-sub{
+  color:var(--muted2);
+  font-size:11px;
+  margin-top:5px;
+}
+
+/* =====================================================
+   VIRTUAL CARD
+   UNCHANGED
+===================================================== */
+.vcard{
+  position:relative;
+  width:100%;
+  aspect-ratio:1.586;
+  border-radius:22px;
+  padding:22px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#102b3b 0%,#123e4d 45%,#061923 100%);
+  box-shadow:0 20px 45px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.12);
+  transition:.35s;
+  margin-bottom:16px;
+}
+
+.vcard::before{
+  content:"";
+  position:absolute;
+  width:250px;
+  height:250px;
+  border-radius:50%;
+  background:rgba(0,255,180,.08);
+  right:-90px;
+  top:-110px;
+}
+
+.vcard::after{
+  content:"";
+  position:absolute;
+  width:210px;
+  height:210px;
+  border-radius:50%;
+  background:rgba(0,150,255,.07);
+  left:-90px;
+  bottom:-110px;
+}
+
+.vc-top,.vc-chip,.vc-num,.vc-info,.vc-net{
+  position:relative;
+  z-index:2;
+}
+
+.vc-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.vc-type{
+  font-size:10px;
+  letter-spacing:2.5px;
+  color:#d3e0e7;
+  font-weight:700;
+}
+
+.vc-nfc{
+  font-size:21px;
+  transform:rotate(90deg);
+  color:#d6e3e8;
+  line-height:1;
+}
+
+.vc-chip{
+  width:43px;
+  height:32px;
+  border-radius:7px;
+  margin-top:20px;
+  position:relative;
+  background:linear-gradient(135deg,#eee,#999,#ddd);
+}
+
+.vc-chip::before{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:1px;
+  background:#777;
+  top:50%;
+}
+
+.vc-chip::after{
+  content:"";
+  position:absolute;
+  height:100%;
+  width:1px;
+  background:#777;
+  left:50%;
+}
+
+.vc-num{
+  margin-top:16px;
+  font-family:'Courier New',monospace;
+  font-size:17px;
+  letter-spacing:3px;
+  font-weight:600;
+}
+
+.vc-info{
+  position:absolute;
+  left:22px;
+  bottom:20px;
+  display:flex;
+  gap:20px;
+}
+
+.vc-ilabel{
+  font-size:8px;
+  color:#8da6b4;
+  letter-spacing:1.5px;
+  margin-bottom:3px;
+  font-weight:700;
+  text-transform:uppercase;
+}
+
+.vc-ival{
+  font-size:11px;
+  letter-spacing:1px;
+  font-weight:600;
+}
+
+.vc-net{
+  position:absolute;
+  right:22px;
+  bottom:16px;
+  font-size:26px;
+  font-weight:900;
+  font-style:italic;
+  letter-spacing:-2px;
+}
+
+.vc-badge{
+  position:absolute;
+  top:16px;
+  right:18px;
+  z-index:5;
+  background:rgba(0,0,0,.32);
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:9px;
+  letter-spacing:1px;
+  font-weight:700;
+}
+
+.vc-badge.act{color:#00e897;}
+.vc-badge.frz{color:#7fc7e8;}
+
+.vcard.frozen-card{
+  opacity:.48;
+  filter:grayscale(.75);
+}
+
+/* =========================
+   ACTION GRID
+========================= */
+.action-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.act-btn{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:13px 10px;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+
+.act-btn .ico{
+  width:21px;
+  height:21px;
+}
+
+.act-btn:hover{
+  background:#12384b;
+  border-color:var(--border2);
+}
+
+.act-btn.prim{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;
+  box-shadow:0 4px 14px rgba(0,189,130,.22);
+}
+
+.act-btn.dang{
+  border-color:rgba(224,82,82,.3);
+  color:#e8a0a0;
+}
+
+.dash-status{
+  text-align:center;
+  color:var(--muted2);
+  font-size:12px;
+  margin-top:4px;
+  min-height:17px;
+}
+
+/* =========================
+   PLATFORM GRID
+========================= */
+.platform-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.platform-btn{
+  background:var(--surface2);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  cursor:pointer;
+  text-align:center;
+  transition:.2s;
+  color:#fff;
+}
+
+.platform-btn:hover{
+  border-color:var(--accent);
+  background:var(--surface3);
+}
+
+.platform-btn.active{
+  border-color:var(--accent);
+  background:rgba(0,189,130,.1);
+}
+
+.platform-icon{
+  font-size:24px;
+  margin-bottom:8px;
+}
+
+.platform-name{
+  font-size:12px;
+  font-weight:700;
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#081b28;
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-around;
+  padding:9px 0 env(safe-area-inset-bottom,9px);
+  z-index:100;
+}
+
+.nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  cursor:pointer;
+  padding:4px 8px;
+  border-radius:10px;
+  transition:.2s;
+  color:var(--muted2);
+  min-width:52px;
+}
+
+.nav-item.active{
+  color:var(--accent);
+}
+
+.nav-item .ni{
+  height:21px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.nav-item .nl{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+
+/* =========================
+   PANEL HEADER
+========================= */
+.panel-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.back-btn{
+  width:36px;
+  height:36px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+.panel-title{
+  font-size:18px;
+  font-weight:700;
+}
+
+.sec-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:var(--muted2);
+  text-transform:uppercase;
+  margin:18px 0 10px;
+}
+
+/* =========================
+   TRANSACTION HISTORY
+========================= */
+.tx-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.tx-item{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.tx-item:hover{
+  border-color:var(--border2);
+  background:var(--surface2);
+  transform:translateY(-1px);
+}
+
+.tx-icon{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.tx-icon.credit{background:rgba(0,189,130,.12);}
+.tx-icon.debit{background:rgba(224,82,82,.1);}
+.tx-icon.ref{background:rgba(74,180,232,.1);}
+.tx-icon.kyc{background:rgba(240,169,64,.1);}
+
+.tx-body{
+  flex:1;
+  min-width:0;
+}
+
+.tx-title{
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.tx-sub{
+  font-size:11px;
+  color:var(--muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.tx-amt{
+  font-size:14px;
+  font-weight:800;
+  text-align:right;
+}
+
+.tx-amt.plus{color:var(--accent);}
+.tx-amt.minus{color:var(--danger);}
+
+.tx-date{
+  font-size:10px;
+  color:var(--muted2);
+  text-align:right;
+  margin-top:2px;
+}
+
+.tx-arrow{
+  color:var(--muted2);
+}
+
+/* =========================
+   TRANSACTION OVERVIEW
+========================= */
+.overview-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px 20px;
+  margin-bottom:14px;
+}
+
+.overview-status{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  padding:5px 0 20px;
+}
+
+.overview-icon{
+  width:64px;
+  height:64px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:14px;
+}
+
+.overview-icon.credit{
+  background:rgba(0,189,130,.12);
+  color:var(--accent);
+}
+
+.overview-icon.debit{
+  background:rgba(224,82,82,.1);
+  color:var(--danger);
+}
+
+.overview-icon.ref{
+  background:rgba(74,180,232,.1);
+  color:var(--info);
+}
+
+.overview-icon.kyc{
+  background:rgba(240,169,64,.1);
+  color:var(--warn);
+}
+
+.overview-status h2{
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.overview-status p{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.overview-amount{
+  text-align:center;
+  font-size:32px;
+  font-weight:850;
+  margin:8px 0 22px;
+}
+
+.overview-amount.plus{color:var(--accent);}
+.overview-amount.minus{color:var(--danger);}
+.overview-amount.zero{color:var(--text);}
+
+.detail-list{
+  border-top:1px solid var(--border);
+}
+
+.detail-row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:14px 0;
+  border-bottom:1px solid rgba(25,59,77,.65);
+}
+
+.detail-row:last-child{
+  border-bottom:0;
+}
+
+.detail-label{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.detail-value{
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  text-align:right;
+  max-width:62%;
+  overflow-wrap:anywhere;
+}
+
+.reference-box{
+  background:#071924;
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:13px 14px;
+  margin-top:14px;
+}
+
+.reference-label{
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:5px;
+}
+
+.reference-value{
+  font-family:monospace;
+  font-size:12px;
+  color:#fff;
+  word-break:break-all;
+}
+
+/* =========================
+   CARD CENTER
+========================= */
+.card-center{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:15px;
+}
+
+.card-center-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.card-center-title{
+  font-size:16px;
+  font-weight:750;
+}
+
+.card-center-status{
+  font-size:10px;
+  color:var(--accent);
+  background:rgba(0,189,130,.1);
+  border:1px solid rgba(0,189,130,.2);
+  padding:5px 8px;
+  border-radius:20px;
+}
+
+.card-option-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.card-option{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px 10px;
+  text-align:center;
+  cursor:pointer;
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+}
+
+.card-option:hover{
+  border-color:var(--border2);
+  background:var(--surface3);
+}
+
+.card-option-icon{
+  margin-bottom:6px;
+  color:var(--accent);
+}
+
+/* =========================
+   REFER
+========================= */
+.refer-card{
+  background:linear-gradient(135deg,#0d3326,#0a2535);
+  border:1px solid rgba(0,189,130,.2);
+  border-radius:var(--radius);
+  padding:22px 20px;
+  margin-bottom:16px;
+  text-align:center;
+}
+
+.refer-badge{
+  display:inline-block;
+  background:rgba(0,189,130,.15);
+  border:1px solid rgba(0,189,130,.25);
+  border-radius:20px;
+  padding:5px 14px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--accent);
+  margin-bottom:12px;
+}
+
+.refer-amount{
+  font-size:32px;
+  font-weight:900;
+  color:var(--accent);
+}
+
+.refer-desc{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:6px;
+  line-height:1.6;
+}
+
+.ref-code-box{
+  background:#071924;
+  border:1px solid var(--border2);
+  border-radius:12px;
+  padding:14px 16px;
+  margin:16px 0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.ref-code{
+  font-family:monospace;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:3px;
+}
+
+.ref-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.ref-stat{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+}
+
+.ref-stat .rs-val{
+  font-size:20px;
+  font-weight:800;
+  color:var(--accent);
+}
+
+.ref-stat .rs-label{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+/* =========================
+   TRANSFER
+========================= */
+.transfer-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:14px;
+}
+
+.recipient-found{
+  background:rgba(0,189,130,.07);
+  border:1px solid rgba(0,189,130,.2);
+  border-radius:10px;
+  padding:11px 14px;
+  font-size:13px;
+  margin-top:8px;
+  display:none;
+}
+
+.recipient-found .rf-name{
+  font-weight:700;
+  color:var(--accent);
+}
+
+.recipient-found .rf-num{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.fee-display{
+  background:rgba(240,169,64,.08);
+  border:1px solid rgba(240,169,64,.2);
+  border-radius:10px;
+  padding:12px;
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--muted);
+}
+
+.fee-display .fee-amount{
+  color:var(--warn);
+  font-weight:700;
+}
+
+/* =========================
+   KYC
+========================= */
+.kyc-step{display:none;}
+.kyc-step.active{display:block;}
+
+.kyc-verified-state{
+  text-align:center;
+  padding:20px;
+}
+
+.kyc-v-name{
+  font-size:18px;
+  font-weight:700;
+  color:var(--accent);
+  margin-bottom:6px;
+}
+
+.kyc-v-sub{
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* =========================
+   SMALL SCREENS
+========================= */
+@media(max-width:380px){
+
+  .vcard{padding:17px;}
+
+  .vc-num{
+    font-size:14px;
+    letter-spacing:2px;
+  }
+
+  .vc-info{
+    left:17px;
+    bottom:16px;
+    gap:14px;
+  }
+
+  .vc-net{
+    right:17px;
+    bottom:13px;
+    font-size:22px;
+  }
+
+  .nav-item{
+    padding-left:4px;
+    padding-right:4px;
+    min-width:48px;
+  }
+
+  .nav-item .nl{
+    font-size:8px;
+  }
+
+  .platform-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =====================================================
+     SVG SYMBOLS
+===================================================== -->
+<svg width="0" height="0" style="position:absolute">
+
+<symbol id="i-home" viewBox="0 0 24 24">
+<path d="M3 10.8 12 3l9 7.8v9.2a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-send" viewBox="0 0 24 24">
+<path d="m21 3-7.2 18-3.2-7.6L3 10.2z"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="m10.6 13.4 5.3-5.3"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="i-history" viewBox="0 0 24 24">
+<path d="M3 12a9 9 0 1 0 3-6.7"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M3 4v5h5M12 7v5l3 2"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-card" viewBox="0 0 24 24">
+<rect x="3" y="5" width="18" height="14" rx="2.5"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+<path d="M3 9h18M7 14h4"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="i-gift" viewBox="0 0 24 24">
+<path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M12 7H8.5C5 7 5 3.5 8 3.5c2.3 0 4 3.5 4 3.5Zm0 0h3.5c3.5 0 3.5-3.5.5-3.5-2.3 0-4 3.5-4 3.5Z"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+</symbol>
+
+<symbol id="i-shield" viewBox="0 0 24 24">
+<path d="M12 3 20 6v5.5c0 5.2-3.2 8.1-8 9.5-4.8-1.4-8-4.3-8-9.5V6z"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="m8.5 12 2.2 2.2 4.8-5"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-eye" viewBox="0 0 24 24">
+<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+<circle cx="12" cy="12" r="2.5"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+</symbol>
+
+<symbol id="i-eye-off" viewBox="0 0 24 24">
+<path d="M3 3l18 18M10.6 6.3A10.8 10.8 0 0 1 12 6c6 0 9.5 6 9.5 6a17 17 0 0 1-3.1 3.6M6.3 6.3C3.8 7.8 2.5 12 2.5 12s3.5 6 9.5 6c1 0 1.9-.2 2.7-.5"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="i-copy" viewBox="0 0 24 24">
+<rect x="8" y="8" width="11" height="12" rx="2"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+<path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+</symbol>
+
+<symbol id="i-snow" viewBox="0 0 24 24">
+<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M8 4.8l4 3 4-3M8 19.2l4-3 4 3"
+fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-refresh" viewBox="0 0 24 24">
+<path d="M20 11a8 8 0 0 0-14.8-4L3 10M3 5v5h5M4 13a8 8 0 0 0 14.8 4L21 14m0 5v-5h-5"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-arrow-down" viewBox="0 0 24 24">
+<path d="M12 4v15M6 13l6 6 6-6"
+fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-arrow-up" viewBox="0 0 24 24">
+<path d="M12 20V5M6 11l6-6 6 6"
+fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-chevron" viewBox="0 0 24 24">
+<path d="m9 5 7 7-7 7"
+fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-check" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+<path d="m8 12 2.7 2.7L16.5 9"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-plus" viewBox="0 0 24 24">
+<path d="M12 5v14M5 12h14"
+fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="i-lock" viewBox="0 0 24 24">
+<rect x="5" y="10" width="14" height="11" rx="2"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+<path d="M8 10V7a4 4 0 0 1 8 0v3"
+fill="none" stroke="currentColor" stroke-width="1.8"/>
+</symbol>
+
+<symbol id="i-settings" viewBox="0 0 24 24">
+<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"
+fill="none" stroke="currentColor" stroke-width="1.7"/>
+<path d="m19 13.5 1.2 1-.9 1.6-1.5-.4a7.4 7.4 0 0 1-1.4 1.4l.4 1.5-1.6.9-1-1.2a7.6 7.6 0 0 1-2 .3l-.6 1.4h-1.8l-.6-1.4a7.6 7.6 0 0 1-2-.3l-1 1.2-1.6-.9.4-1.5a7.4 7.4 0 0 1-1.4-1.4l-1.5.4-.9-1.6 1.2-1a7.3 7.3 0 0 1-.3-2l-1.4-.6v-1.8l1.4-.6a7.3 7.3 0 0 1 .3-2l-1.2-1 .9-1.6 1.5.4A7.4 7.4 0 0 1 6.9 5l-.4-1.5 1.6-.9 1 1.2a7.6 7.6 0 0 1 2-.3l.6-1.4h1.8l.6 1.4a7.6 7.6 0 0 1 2 .3l1-1.2 1.6.9-.4 1.5a7.4 7.4 0 0 1 1.4 1.4l1.5-.4.9 1.6-1.2 1a7.3 7.3 0 0 1 .3 2l1.4.6v1.8l-1.4.6a7.3 7.3 0 0 1-.3 2Z"
+fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+</symbol>
+
+<symbol id="i-download" viewBox="0 0 24 24">
+<path d="M12 4v11M7 11l5 5 5-5M5 20h14"
+fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+
+</svg>
+
+<!-- =====================================================
+     SIGN UP
+===================================================== -->
+<div id="signupScreen" class="screen active">
+
+  <div class="logo">
+    <svg class="logo-svg" viewBox="0 0 220 60">
+      <defs>
+        <linearGradient id="fedGradA" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#00f5d4"/>
+          <stop offset="100%" stop-color="#0096c7"/>
+        </linearGradient>
+      </defs>
+
+      <g transform="translate(5,10)">
+        <rect x="0" y="0" width="40" height="40" rx="10" fill="#0b1a2b"/>
+        <circle cx="15" cy="20" r="6" stroke="url(#fedGradA)" stroke-width="2"/>
+        <circle cx="25" cy="20" r="6" stroke="url(#fedGradA)" stroke-width="2"/>
+        <path d="M12 12 H26 M12 20 H22 M12 28 H20"
+        stroke="#00f5d4" stroke-width="2" stroke-linecap="round"/>
+      </g>
+
+      <text x="55" y="30" fill="#ffffff" font-size="14"
+      font-family="Arial,sans-serif" font-weight="700">FedChain</text>
+
+      <text x="55" y="48" fill="#00f5d4" font-size="12"
+      font-family="Arial,sans-serif">VIRTUAL FINANCE</text>
+    </svg>
+
+    <div>
+      <div class="logo-text">FedChain</div>
+      <div class="logo-sub">VIRTUAL FINANCE</div>
+    </div>
+  </div>
+
+  <div class="card-box">
+
+    <h2>Create Account</h2>
+    <p class="sub">Open your free Nigerian virtual account.</p>
+
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="su_name"
+      placeholder="e.g. Chukwuemeka Okafor"
+      autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>Nigerian Phone Number</label>
+
+      <div class="phone-row">
+        <div class="flag-pre">
+          🇳🇬 +234
+        </div>
+
+        <div class="field">
+          <input type="tel" id="su_phone"
+          placeholder="08012345678"
+          maxlength="11">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="su_pass"
+      placeholder="Min. 6 characters">
+    </div>
+
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="su_pass2"
+      placeholder="Repeat password">
+    </div>
+
+    <div class="field">
+      <label>Referral Code (Optional)</label>
+      <input type="text" id="su_ref"
+      placeholder="Enter referral code"
+      autocomplete="off"
+      style="text-transform:uppercase;">
+    </div>
+
+    <div style="margin-top:6px;">
+      <button class="btn btn-primary"
+      onclick="requestSMSOTP()">
+        Send OTP via SMS
+      </button>
+    </div>
+
+    <div class="msg info" id="su_msg"></div>
+
+  </div>
+
+  <div class="link-row">
+    Already have an account?
+    <a onclick="showLogin()">Sign In</a>
+  </div>
+
+</div>
+
+<!-- =====================================================
+     OTP
+===================================================== -->
+<div id="otpScreen" class="screen">
+
+  <div class="logo">
+    <svg class="logo-svg" viewBox="0 0 220 60">
+      <rect x="5" y="10" width="40" height="40" rx="10" fill="#0b1a2b"/>
+      <path d="M14 30h22M18 24h14M18 36h14"
+      stroke="#00f5d4" stroke-width="2"
+      stroke-linecap="round"/>
+      <text x="55" y="30" fill="#fff" font-size="14"
+      font-family="Arial" font-weight="700">FedChain</text>
+      <text x="55" y="48" fill="#00f5d4" font-size="12"
+      font-family="Arial">VERIFY PHONE</text>
+    </svg>
+
+    <div>
+      <div class="logo-text">FedChain</div>
+      <div class="logo-sub">VERIFY PHONE</div>
+    </div>
+  </div>
+
+  <div class="card-box">
+
+    <h2>Phone Verification</h2>
+    <p class="sub">
+      Enter the 6-digit SMS code sent to your number.
+    </p>
+
+    <div class="otp-hint">
+      SMS sent to
+      <strong id="otp_phone_show" style="color:#fff;"></strong>
+      <br>
+      <span style="color:var(--muted);font-size:11px;margin-top:5px;display:block;">
+        For testing: use code below
+      </span>
+      <div class="otp-code-display" id="demo_sms_code">------</div>
+    </div>
+
+    <div class="otp-row">
+      <input type="text" maxlength="1" id="p0"
+      oninput="otpNav(this,0,'p')">
+      <input type="text" maxlength="1" id="p1"
+      oninput="otpNav(this,1,'p')">
+      <input type="text" maxlength="1" id="p2"
+      oninput="otpNav(this,2,'p')">
+      <input type="text" maxlength="1" id="p3"
+      oninput="otpNav(this,3,'p')">
+      <input type="text" maxlength="1" id="p4"
+      oninput="otpNav(this,4,'p')">
+      <input type="text" maxlength="1" id="p5"
+      oninput="otpNav(this,5,'p')">
+    </div>
+
+    <div class="resend-row">
+      Didn't get it?
+      <a onclick="resendSMSOTP()">Resend SMS</a>
+    </div>
+
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary"
+      onclick="verifySMSOTP()">
+        Verify & Create Account
+      </button>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button class="btn btn-ghost"
+      onclick="showScreen('signupScreen')">
+        ← Back
+      </button>
+    </div>
+
+    <div class="msg info" id="otp_msg"></div>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+<div id="loginScreen" class="screen">
+
+  <div class="logo">
+    <svg class="logo-svg" viewBox="0 0 220 60">
+      <rect x="5" y="10" width="40" height="40" rx="10" fill="#0b1a2b"/>
+      <circle cx="15" cy="30" r="6"
+      stroke="#00f5d4" stroke-width="2"/>
+      <circle cx="25" cy="30" r="6"
+      stroke="#0096c7" stroke-width="2"/>
+      <path d="M12 22h14M12 30h10M12 38h8"
+      stroke="#00f5d4" stroke-width="2"
+      stroke-linecap="round"/>
+      <text x="55" y="30" fill="#fff" font-size="14"
+      font-family="Arial" font-weight="700">FedChain</text>
+      <text x="55" y="48" fill="#00f5d4" font-size="12"
+      font-family="Arial">VIRTUAL FINANCE</text>
+    </svg>
+
+    <div>
+      <div class="logo-text">FedChain</div>
+      <div class="logo-sub">VIRTUAL FINANCE</div>
+    </div>
+  </div>
+
+  <div class="card-box">
+
+    <h2>Welcome Back</h2>
+    <p class="sub">Sign in to your FedChain account.</p>
+
+    <div class="field">
+      <label>Phone Number</label>
+
+      <div class="phone-row">
+        <div class="flag-pre">🇳🇬 +234</div>
+
+        <div class="field">
+          <input type="tel"
+          id="li_phone"
+          placeholder="08012345678"
+          maxlength="11">
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <input type="password"
+      id="li_pass"
+      placeholder="Your password">
+    </div>
+
+    <div style="margin-top:6px;">
+      <button class="btn btn-primary"
+      onclick="login()">
+        Sign In
+      </button>
+    </div>
+
+    <div class="msg info" id="li_msg"></div>
+
+  </div>
+
+  <div class="link-row">
+    New here?
+    <a onclick="showScreen('signupScreen')">
+      Create Account
+    </a>
+  </div>
+
+</div>
+
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
+<div id="dashScreen" class="screen">
+
+  <div class="dash-header">
+
+    <div>
+      <div class="dash-greet">Good day</div>
+      <div class="dash-name" id="d_name">—</div>
+    </div>
+
+    <button class="logout-btn"
+    onclick="logout()"
+    title="Logout">
+
+      <svg class="svg-icon">
+        <use href="#i-lock"></use>
+      </svg>
+
+    </button>
+
+  </div>
+
+  <div class="kyc-banner"
+  id="kycBanner"
+  onclick="goPanel('kycPanel')">
+
+    <div class="kyc-icon" id="kycIcon">
+      <svg class="svg-icon">
+        <use href="#i-shield"></use>
+      </svg>
+    </div>
+
+    <div class="kyc-text">
+
+      <div class="kyc-title" id="kycTitle">
+        Complete KYC Verification
+      </div>
+
+      <div class="kyc-sub" id="kycSub">
+        Verify your email to unlock higher limits
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="acct-pill">
+
+    <div>
+      <div class="acct-label">Account Number</div>
+      <div class="acct-num" id="d_acct">—</div>
+    </div>
+
+    <button class="copy-btn"
+    onclick="copyText(document.getElementById('d_acct').textContent,'Account number copied')">
+      Copy
+    </button>
+
+  </div>
+
+  <div class="balance-box">
+
+    <div class="bal-label">
+      AVAILABLE BALANCE
+    </div>
+
+    <div class="bal-amount">
+      <span class="cur">₦</span>
+      <span id="d_bal">0.00</span>
+    </div>
+
+    <div class="bal-sub" id="d_bal_time">—</div>
+
+  </div>
+
+  <!-- ORIGINAL CARD LEFT INTACT -->
+  <div class="vcard" id="virtualCard">
+
+    <div class="vc-badge act" id="vcBadge">
+      ● ACTIVE
+    </div>
+
+    <div class="vc-top">
+      <div class="vc-type">
+        VIRTUAL DEBIT
+      </div>
+
+      <div class="vc-nfc">
+        )))
+      </div>
+    </div>
+
+    <div class="vc-chip"></div>
+
+    <div class="vc-num" id="vcNum">
+      •••• •••• •••• ••••
+    </div>
+
+    <div class="vc-info">
+
+      <div>
+        <div class="vc-ilabel">
+          Card Holder
+        </div>
+
+        <div class="vc-ival" id="vcHolder">
+          —
+        </div>
+      </div>
+
+      <div>
+        <div class="vc-ilabel">
+          Expires
+        </div>
+
+        <div class="vc-ival" id="vcExpiry">
+          ••/••
+        </div>
+      </div>
+
+      <div>
+        <div class="vc-ilabel">
+          CVV
+        </div>
+
+        <div class="vc-ival" id="vcCVV">
+          •••
+        </div>
+      </div>
+
+    </div>
+
+    <div class="vc-net">
+      VISA
+    </div>
+
+  </div>
+
+  <div class="action-grid">
+
+    <button class="act-btn prim"
+    onclick="toggleCardDetails()"
+    id="toggleBtn">
+
+      <svg class="svg-icon">
+        <use href="#i-eye"></use>
+      </svg>
+
+      Show Details
+    </button>
+
+    <button class="act-btn"
+    onclick="copyCardNum()">
+
+      <svg class="svg-icon">
+        <use href="#i-copy"></use>
+      </svg>
+
+      Copy Number
+    </button>
+
+    <button class="act-btn dang"
+    onclick="freezeCard()"
+    id="freezeBtn">
+
+      <svg class="svg-icon">
+        <use href="#i-snow"></use>
+      </svg>
+
+      Freeze Card
+    </button>
+
+    <button class="act-btn"
+    onclick="refreshBal()">
+
+      <svg class="svg-icon">
+        <use href="#i-refresh"></use>
+      </svg>
+
+      Refresh Balance
+    </button>
+
+  </div>
+
+  <div class="dash-status" id="d_status"></div>
+
+  <div style="height:70px;"></div>
+
+</div>
+
+<!-- =====================================================
+     TRANSFER
+===================================================== -->
+<div id="transferPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goHome()">
+      ←
+    </button>
+
+    <div class="panel-title">
+      Send Money
+    </div>
+
+  </div>
+
+  <div class="transfer-box">
+
+    <div style="margin-bottom:14px;">
+      <label style="display:block;font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;text-transform:uppercase;">
+        Send To
+      </label>
+
+      <div class="platform-grid" id="platformGrid">
+        <button class="platform-btn active" 
+        onclick="selectPlatform('fedchain')">
+          <div class="platform-icon">💳</div>
+          <div class="platform-name">FedChain User</div>
+        </button>
+
+        <button class="platform-btn" 
+        onclick="selectPlatform('opay')">
+          <div class="platform-icon">🏦</div>
+          <div class="platform-name">Opay</div>
+        </button>
+
+        <button class="platform-btn" 
+        onclick="selectPlatform('palmpay')">
+          <div class="platform-icon">🏦</div>
+          <div class="platform-name">Palmpay</div>
+        </button>
+
+        <button class="platform-btn" 
+        onclick="selectPlatform('moniepoint')">
+          <div class="platform-icon">🏦</div>
+          <div class="platform-name">Moniepoint</div>
+        </button>
+
+        <button class="platform-btn" 
+        onclick="selectPlatform('kuda')">
+          <div class="platform-icon">🏦</div>
+          <div class="platform-name">Kuda</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="field" id="recipientField">
+
+      <label id="recipientLabel">
+        Recipient Account Number
+      </label>
+
+      <input
+      type="tel"
+      id="tr_acct"
+      maxlength="11"
+      placeholder="08012345678"
+      oninput="lookupRecipient(this.value)">
+
+      <div class="recipient-found"
+      id="recipientFound">
+
+        <div class="rf-name"
+        id="rfName">
+          —
+        </div>
+
+        <div class="rf-num"
+        id="rfNum">
+          —
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Amount (₦)
+      </label>
+
+      <input
+      type="number"
+      id="tr_amount"
+      placeholder="e.g. 5000"
+      min="40"
+      oninput="updateFeeDisplay()">
+
+    </div>
+
+    <div class="field">
+
+      <label>
+        Note (Optional)
+      </label>
+
+      <input
+      type="text"
+      id="tr_note"
+      placeholder="e.g. Rent payment">
+
+    </div>
+
+    <div class="fee-display" id="feeDisplay">
+      <div style="margin-bottom:5px;font-weight:700;">Transaction Summary</div>
+      <div>Amount: <span id="feeAmount">₦0.00</span></div>
+      <div>Fee: <span class="fee-amount">₦30.00</span></div>
+      <div style="margin-top:5px;border-top:1px solid rgba(255,255,255,.1);padding-top:5px;font-weight:700;">
+        Total Debit: <span id="feeTotal">₦30.00</span>
+      </div>
+    </div>
+
+    <button
+    class="btn btn-primary"
+    style="margin-top:12px;"
+    onclick="doTransfer()">
+      Send ₦ Now
+    </button>
+
+    <div class="msg info"
+    id="tr_msg"></div>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     HISTORY
+===================================================== -->
+<div id="historyPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goHome()">
+      ←
+    </button>
+
+    <div class="panel-title">
+      Transaction History
+    </div>
+
+  </div>
+
+  <div class="sec-label">
+    Recent Activity
+  </div>
+
+  <div id="txList"
+  class="tx-list"></div>
+
+</div>
+
+<!-- =====================================================
+     TRANSACTION OVERVIEW
+===================================================== -->
+<div id="txOverviewPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goPanel('historyPanel')">
+      ←
+    </button>
+
+    <div class="panel-title">
+      Transaction Overview
+    </div>
+
+  </div>
+
+  <div class="overview-card">
+
+    <div class="overview-status">
+
+      <div class="overview-icon"
+      id="overviewIcon">
+
+        <svg class="svg-icon lg">
+          <use id="overviewIconUse"
+          href="#i-check"></use>
+        </svg>
+
+      </div>
+
+      <h2 id="overviewTitle">
+        Transaction
+      </h2>
+
+      <p id="overviewSub">
+        —
+      </p>
+
+    </div>
+
+    <div class="overview-amount"
+    id="overviewAmount">
+      ₦0.00
+    </div>
+
+    <div class="detail-list">
+
+      <div class="detail-row">
+        <div class="detail-label">Status</div>
+        <div class="detail-value"
+        id="overviewStatus">
+          Completed
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Date</div>
+        <div class="detail-value"
+        id="overviewDate">
+          —
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Description</div>
+        <div class="detail-value"
+        id="overviewDescription">
+          —
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Transaction Type</div>
+        <div class="detail-value"
+        id="overviewType">
+          —
+        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-label">Reference</div>
+        <div class="detail-value"
+        id="overviewReference">
+          —
+        </div>
+      </div>
+
+    </div>
+
+    <div class="reference-box">
+
+      <div class="reference-label">
+        Transaction Reference
+      </div>
+
+      <div class="reference-value"
+      id="overviewReferenceBox">
+        —
+      </div>
+
+    </div>
+
+  </div>
+
+  <button
+  class="btn btn-ghost"
+  onclick="goPanel('historyPanel')">
+    Back to Transaction History
+  </button>
+
+</div>
+
+<!-- =====================================================
+     CARD CENTER
+===================================================== -->
+<div id="cardPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goHome()">
+      ←
+    </button>
+
+    <div class="panel-title">
+      My Cards
+    </div>
+
+  </div>
+
+  <div class="card-center">
+
+    <div class="card-center-head">
+
+      <div class="card-center-title">
+        Virtual Debit Card
+      </div>
+
+      <div
+      class="card-center-status"
+      id="cardCenterStatus">
+        ACTIVE
+      </div>
+
+    </div>
+
+    <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:15px;">
+      Manage your virtual card and access available card options.
+    </div>
+
+    <button
+    class="btn btn-primary"
+    onclick="goHome()"
+    style="margin-bottom:10px;">
+      Open Card
+    </button>
+
+  </div>
+
+  <div class="card-center">
+
+    <div class="card-center-title"
+    style="margin-bottom:13px;">
+      Card Options
+    </div>
+
+    <div class="card-option-grid">
+
+      <div class="card-option"
+      onclick="toggleCardFromPanel()">
+
+        <div class="card-option-icon">
+          <svg class="svg-icon">
+            <use href="#i-eye"></use>
+          </svg>
+        </div>
+
+        View Details
+
+      </div>
+
+      <div class="card-option"
+      onclick="freezeCard()">
+
+        <div class="card-option-icon">
+          <svg class="svg-icon">
+            <use href="#i-snow"></use>
+          </svg>
+        </div>
+
+        Freeze Card
+
+      </div>
+
+      <div class="card-option"
+      onclick="copyCardNum()">
+
+        <div class="card-option-icon">
+          <svg class="svg-icon">
+            <use href="#i-copy"></use>
+          </svg>
+        </div>
+
+        Copy Number
+
+      </div>
+
+      <div class="card-option"
+      onclick="refreshBal()">
+
+        <div class="card-option-icon">
+          <svg class="svg-icon">
+            <use href="#i-refresh"></use>
+          </svg>
+        </div>
+
+        Refresh
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     REFER
+===================================================== -->
+<div id="referPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goHome()">
+      ←
+    </button>
+
+    <div class="panel-title">
+      Refer & Earn
+    </div>
+
+  </div>
+
+  <div class="refer-card">
+
+    <div class="refer-badge">
+      BONUS REWARD
+    </div>
+
+    <div class="refer-amount">
+      ₦2,000
+    </div>
+
+    <div class="refer-desc">
+      Earn ₦2,000 for every Nigerian friend that signs up and completes their first transaction using your code.
+    </div>
+
+  </div>
+
+  <div class="ref-code-box">
+
+    <div>
+
+      <div style="font-size:10px;color:var(--muted);letter-spacing:1px;font-weight:700;text-transform:uppercase;margin-bottom:5px;">
+        Your Referral Code
+      </div>
+
+      <div class="ref-code"
+      id="refCode">
+        —
+      </div>
+
+    </div>
+
+    <button class="copy-btn"
+    onclick="copyRefCode()">
+      Copy
+    </button>
+
+  </div>
+
+  <div class="ref-stats">
+
+    <div class="ref-stat">
+
+      <div class="rs-val"
+      id="refCount">
+        0
+      </div>
+
+      <div class="rs-label">
+        Friends Referred
+      </div>
+
+    </div>
+
+    <div class="ref-stat">
+
+      <div class="rs-val"
+      id="refEarned">
+        ₦0
+      </div>
+
+      <div class="rs-label">
+        Total Earned
+      </div>
+
+    </div>
+
+  </div>
+
+  <button
+  class="btn btn-primary"
+  onclick="shareRef()">
+    Share Referral Link
+  </button>
+
+  <div
+  class="msg info"
+  id="ref_msg">
+  </div>
+
+</div>
+
+<!-- =====================================================
+     KYC
+===================================================== -->
+<div id="kycPanel" class="screen">
+
+  <div class="panel-header">
+
+    <button class="back-btn"
+    onclick="goHome()">
+      ←
+    </button>
+
+    <div class="panel-title">
+      KYC Verification
+    </div>
+
+  </div>
+
+  <div class="kyc-step active"
+  id="kycStep1">
+
+    <div class="card-box">
+
+      <h2>
+        Verify Your Email
+      </h2>
+
+      <p class="sub">
+        Add your email address to complete identity verification.
+      </p>
+
+      <div class="field">
+
+        <label>Email Address</label>
+
+        <input
+        type="email"
+        id="kyc_email"
+        placeholder="you@example.com">
+
+      </div>
+
+      <button
+      class="btn btn-primary"
+      onclick="sendEmailOTP()">
+        Send Email OTP
+      </button>
+
+      <div class="msg info"
+      id="kyc_msg1">
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="kyc-step"
+  id="kycStep2">
+
+    <div class="card-box">
+
+      <h2>
+        Email Confirmation
+      </h2>
+
+      <p class="sub">
+        Enter the 6-digit code sent to your email.
+      </p>
+
+      <div class="otp-hint">
+
+        Code sent to
+        <strong
+        id="kyc_email_show"
+        style="color:#fff;">
+        </strong>
+
+        <br>
+
+        <span style="color:var(--muted);font-size:11px;margin-top:5px;display:block;">
+          For testing: use code below
+        </span>
+
+        <div class="otp-code-display" id="demo_email_code">------</div>
+
+      </div>
+
+      <div class="otp-row">
+
+        <input type="text" maxlength="1"
+        id="e0"
+        oninput="otpNav(this,0,'e')">
+
+        <input type="text" maxlength="1"
+        id="e1"
+        oninput="otpNav(this,1,'e')">
+
+        <input type="text" maxlength="1"
+        id="e2"
+        oninput="otpNav(this,2,'e')">
+
+        <input type="text" maxlength="1"
+        id="e3"
+        oninput="otpNav(this,3,'e')">
+
+        <input type="text" maxlength="1"
+        id="e4"
+        oninput="otpNav(this,4,'e')">
+
+        <input type="text" maxlength="1"
+        id="e5"
+        oninput="otpNav(this,5,'e')">
+
+      </div>
+
+      <div class="resend-row">
+        Didn't get it?
+        <a onclick="sendEmailOTP(true)">
+          Resend Email
+        </a>
+      </div>
+
+      <div style="margin-top:16px;">
+
+        <button
+        class="btn btn-primary"
+        onclick="verifyEmailOTP()">
+          Confirm Email
+        </button>
+
+      </div>
+
+      <div class="msg info"
+      id="kyc_msg2">
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="kyc-step"
+  id="kycStep3">
+
+    <div class="card-box">
+
+      <div class="kyc-verified-state">
+
+        <svg
+        class="svg-icon lg"
+        style="width:54px;height:54px;color:var(--accent);margin-bottom:12px;">
+          <use href="#i-check"></use>
+        </svg>
+
+        <div class="kyc-v-name">
+          KYC Verified!
+        </div>
+
+        <div class="kyc-v-sub">
+          Your identity has been verified.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+<div
+class="bottom-nav"
+id="bottomNav"
+style="display:none;">
+
+  <div
+  class="nav-item active"
+  id="nav_home"
+  onclick="goHome()">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-home"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      Home
+    </div>
+
+  </div>
+
+  <div
+  class="nav-item"
+  id="nav_transfer"
+  onclick="goPanel('transferPanel')">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-send"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      Transfer
+    </div>
+
+  </div>
+
+  <div
+  class="nav-item"
+  id="nav_history"
+  onclick="goPanel('historyPanel')">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-history"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      History
+    </div>
+
+  </div>
+
+  <div
+  class="nav-item"
+  id="nav_card"
+  onclick="goPanel('cardPanel')">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-card"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      Cards
+    </div>
+
+  </div>
+
+  <div
+  class="nav-item"
+  id="nav_refer"
+  onclick="goPanel('referPanel')">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-gift"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      Refer
+    </div>
+
+  </div>
+
+  <div
+  class="nav-item"
+  id="nav_kyc"
+  onclick="goPanel('kycPanel')">
+
+    <div class="ni">
+      <svg class="svg-icon">
+        <use href="#i-shield"></use>
+      </svg>
+    </div>
+
+    <div class="nl">
+      KYC
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+/* =====================================================
+   CONFIG & CONSTANTS
+===================================================== */
+
+const INITIAL_BAL = 5000;
+const REFER_BONUS = 2000;
+const TRANSACTION_FEE = 30;
+
+let pendingPhoneOTP = null;
+let pendingEmailOTP = null;
+let pendingSignup = {};
+
+let detailsVisible = false;
+let cardFrozen = false;
+let currentPanel = 'dashScreen';
+let selectedPlatform = 'fedchain';
+
+let selectedTransaction = null;
+let recipientPhone = null;
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+const $ = id => document.getElementById(id);
+
+const fmtNGN = v =>
+  '₦' + Number(v).toLocaleString('en-NG',{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+
+const cleanPhone = s =>
+  String(s || '').replace(/\D/g,'');
+
+const isNGPhone = n =>
+  /^0[789]\d{9}$/.test(n);
+
+const genOTP = () =>
+  String(Math.floor(100000 + Math.random()*900000));
+
+const genRefCode = name =>
+  name.split(' ')[0].toUpperCase().slice(0,4)
+  + Math.floor(1000 + Math.random()*9000);
+
+const now = () =>
+  new Date().toLocaleString('en-NG',{
+    day:'2-digit',
+    month:'short',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  });
+
+const txReference = () =>
+  'FC' +
+  Date.now().toString(36).toUpperCase() +
+  Math.random().toString(36).substring(2,7).toUpperCase();
+
+function escapeHTML(value){
+  return String(value ?? '')
+  .replace(/&/g,'&amp;')
+  .replace(/</g,'&lt;')
+  .replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;')
+  .replace(/'/g,'&#039;');
+}
+
+function setMsg(id,txt,type='info'){
+  const el=$(id);
+  if(!el)return;
+  el.textContent=txt;
+  el.className='msg '+type;
+}
+
+let toastTimer;
+
+function toast(msg,type='info'){
+
+  const t=$('toast');
+
+  t.textContent=msg;
+  t.className='show t-'+type;
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    t.className='';
+  },3000);
+}
+
+/* =====================================================
+   SCREEN MANAGEMENT
+===================================================== */
+
+function showScreen(id){
+
+  [
+    'signupScreen',
+    'otpScreen',
+    'loginScreen',
+    'dashScreen',
+    'transferPanel',
+    'historyPanel',
+    'txOverviewPanel',
+    'cardPanel',
+    'referPanel',
+    'kycPanel'
+  ].forEach(s=>{
+
+    const el=$(s);
+
+    if(el){
+      el.classList.toggle(
+        'active',
+        s===id
+      );
+    }
+
+  });
+
+  const dashPanels=[
+    'dashScreen',
+    'transferPanel',
+    'historyPanel',
+    'txOverviewPanel',
+    'cardPanel',
+    'referPanel',
+    'kycPanel'
+  ];
+
+  $('bottomNav').style.display =
+    dashPanels.includes(id) ? 'flex' : 'none';
+
+  setActiveNav(id);
+
+  currentPanel=id;
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+}
+
+function goHome(){
+  showScreen('dashScreen');
+  refreshBal();
+}
+
+function goPanel(id){
+
+  showScreen(id);
+
+  if(id==='historyPanel'){
+    renderHistory();
+  }
+
+  if(id==='referPanel'){
+    renderRefer();
+  }
+
+  if(id==='kycPanel'){
+    renderKYC();
+  }
+
+  if(id==='cardPanel'){
+    updateCardCenter();
+  }
+
+  if(id==='transferPanel'){
+    selectedPlatform='fedchain';
+    updatePlatformUI();
+  }
+}
+
+function setActiveNav(id){
+
+  const map={
+    dashScreen:'nav_home',
+    transferPanel:'nav_transfer',
+    historyPanel:'nav_history',
+    txOverviewPanel:'nav_history',
+    cardPanel:'nav_card',
+    referPanel:'nav_refer',
+    kycPanel:'nav_kyc'
+  };
+
+  document
+  .querySelectorAll('.nav-item')
+  .forEach(n=>n.classList.remove('active'));
+
+  if(map[id] && $(map[id])){
+    $(map[id]).classList.add('active');
+  }
+}
+
+/* =====================================================
+   LOCAL STORAGE
+===================================================== */
+
+function getUser(phone){
+
+  const r=
+    localStorage.getItem('vng_'+phone);
+
+  return r ? JSON.parse(r) : null;
+}
+
+function saveUser(data){
+
+  localStorage.setItem(
+    'vng_'+data.phone,
+    JSON.stringify(data)
+  );
+}
+
+function getSession(){
+  return localStorage.getItem('vng_session');
+}
+
+function setSession(phone){
+  localStorage.setItem(
+    'vng_session',
+    phone
+  );
+}
+
+function clearSession(){
+  localStorage.removeItem('vng_session');
+}
+
+function addTxDirect(user,tx){
+
+  if(!user.history){
+    user.history=[];
+  }
+
+  user.history.unshift({
+    ...tx,
+    time:now(),
+    reference:tx.reference || txReference()
+  });
+}
+
+function addTx(phone,tx){
+
+  const user=getUser(phone);
+
+  if(!user)return;
+
+  addTxDirect(user,tx);
+
+  saveUser(user);
+}
+
+/* =====================================================
+   OTP
+===================================================== */
+
+function otpNav(el,idx,prefix){
+
+  el.value=
+    el.value.replace(/\D/g,'');
+
+  if(
+    el.value &&
+    idx<5
+  ){
+    $(prefix+(idx+1)).focus();
+  }
+}
+
+function getOTPVal(prefix){
+
+  let c='';
+
+  for(let i=0;i<6;i++){
+    c += $(prefix+i).value;
+  }
+
+  return c;
+}
+
+function clearOTP(prefix){
+
+  for(let i=0;i<6;i++){
+    $(prefix+i).value='';
+  }
+}
+
+/* =====================================================
+   CARD GENERATION
+===================================================== */
+
+function genCard(phone){
+
+  const last4=phone.slice(-4);
+
+  const r4=() =>
+    Math.floor(1000+Math.random()*9000);
+
+  const number=
+    `4${r4()} ${r4()} ${r4()} ${last4}`;
+
+  const cvv=
+    String(Math.floor(100+Math.random()*900));
+
+  const d=new Date();
+
+  const m=
+    String(d.getMonth()+1)
+    .padStart(2,'0');
+
+  const y=
+    String(d.getFullYear()+4)
+    .slice(-2);
+
+  return {
+    number,
+    cvv,
+    expiry:`${m}/${y}`
+  };
+}
+
+/* =====================================================
+   SIGNUP
+===================================================== */
+
+function requestSMSOTP(){
+
+  const name=
+    ($('su_name').value||'').trim();
+
+  const phone=
+    cleanPhone(
+      $('su_phone').value.trim()
+    );
+
+  const pass=
+    $('su_pass').value;
+
+  const pass2=
+    $('su_pass2').value;
+
+  const refCode=
+    ($('su_ref').value||'')
+    .trim()
+    .toUpperCase();
+
+  if(
+    !name ||
+    name.split(' ').filter(Boolean).length<2
+  ){
+    return setMsg(
+      'su_msg',
+      'Enter your full first and last name.',
+      'error'
+    );
+  }
+
+  if(!isNGPhone(phone)){
+    return setMsg(
+      'su_msg',
+      'Enter a valid Nigerian number.',
+      'error'
+    );
+  }
+
+  if(pass.length<6){
+    return setMsg(
+      'su_msg',
+      'Password must be at least 6 characters.',
+      'error'
+    );
+  }
+
+  if(pass!==pass2){
+    return setMsg(
+      'su_msg',
+      'Passwords do not match.',
+      'error'
+    );
+  }
+
+  if(getUser(phone)){
+    return setMsg(
+      'su_msg',
+      'Number already registered. Please sign in.',
+      'error'
+    );
+  }
+
+  /* 
+     BACKEND INTEGRATION POINT:
+     In production, call your SMS API here (Twilio, Vonage, etc.)
+     Example: await sendSMSOTP(phone, '+234' + phone.slice(1))
+     For demo, we generate locally
+  */
+
+  pendingPhoneOTP=genOTP();
+
+  pendingSignup={
+    name,
+    phone,
+    pass,
+    refCode
+  };
+
+  $('otp_phone_show').textContent=
+    '+234 '+phone.slice(1);
+
+  $('demo_sms_code').textContent=
+    pendingPhoneOTP;
+
+  clearOTP('p');
+
+  showScreen('otpScreen');
+
+  setTimeout(()=>{
+    $('p0').focus();
+  },200);
+
+  toast(
+    'SMS OTP sent to +234 '+phone.slice(1),
+    'info'
+  );
+}
+
+function resendSMSOTP(){
+
+  /* 
+     BACKEND INTEGRATION POINT:
+     Call SMS API again with new OTP
+  */
+
+  pendingPhoneOTP=genOTP();
+
+  $('demo_sms_code').textContent=
+    pendingPhoneOTP;
+
+  clearOTP('p');
+
+  $('p0').focus();
+
+  setMsg(
+    'otp_msg',
+    'New SMS code sent - check message',
+    'success'
+  );
+
+  toast(
+    'New SMS code: '+pendingPhoneOTP,
+    'success'
+  );
+}
+
+function verifySMSOTP(){
+
+  const entered=
+    getOTPVal('p');
+
+  if(entered.length<6){
+    return setMsg(
+      'otp_msg',
+      'Enter all 6 digits.',
+      'error'
+    );
+  }
+
+  if(entered!==pendingPhoneOTP){
+    return setMsg(
+      'otp_msg',
+      'Incorrect code. Try again.',
+      'error'
+    );
+  }
+
+  const {
+    name,
+    phone,
+    pass,
+    refCode
+  }=pendingSignup;
+
+  const card=genCard(phone);
+
+  const myRefCode=
+    genRefCode(name);
+
+  const user={
+    name,
+    phone,
+    pass,
+    card,
+
+    balance:INITIAL_BAL,
+
+    frozen:false,
+
+    kycVerified:false,
+    kycEmail:'',
+
+    refCode:myRefCode,
+    referredBy:refCode||null,
+
+    referralCount:0,
+    referralEarned:0,
+
+    history:[],
+
+    created:Date.now()
+  };
+
+  saveUser(user);
+
+  if(refCode){
+
+    let referrer=null;
+
+    for(
+      let i=0;
+      i<localStorage.length;
+      i++
+    ){
+
+      const k=
+        localStorage.key(i);
+
+      if(
+        k &&
+        k.startsWith('vng_') &&
+        k!=='vng_session'
+      ){
+
+        try{
+
+          const u=
+            JSON.parse(
+              localStorage.getItem(k)
+            );
+
+          if(u.refCode===refCode){
+            referrer=u;
+            break;
+          }
+
+        }catch(e){}
+
+      }
+    }
+
+    if(referrer){
+
+      referrer.balance +=
+        REFER_BONUS;
+
+      referrer.referralCount=
+        (referrer.referralCount||0)+1;
+
+      referrer.referralEarned=
+        (referrer.referralEarned||0)
+        +REFER_BONUS;
+
+      addTxDirect(
+        referrer,
+        {
+          type:'credit',
+          icon:'ref',
+          title:'Referral Bonus',
+          sub:'New user: '+name,
+          amount:REFER_BONUS
+        }
+      );
+
+      saveUser(referrer);
+    }
+  }
+
+  addTx(
+    phone,
+    {
+      type:'credit',
+      icon:'credit',
+      title:'Welcome Bonus',
+      sub:'Account opened',
+      amount:INITIAL_BAL
+    }
+  );
+
+  setSession(phone);
+
+  setTimeout(()=>{
+
+    loadDashboard(
+      getUser(phone)
+    );
+
+    showScreen('dashScreen');
+
+  },500);
+}
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function login(){
+
+  const phone=
+    cleanPhone(
+      $('li_phone').value.trim()
+    );
+
+  const pass=
+    $('li_pass').value;
+
+  if(!isNGPhone(phone)){
+    return setMsg(
+      'li_msg',
+      'Enter a valid Nigerian phone number.',
+      'error'
+    );
+  }
+
+  const user=
+    getUser(phone);
+
+  if(!user){
+    return setMsg(
+      'li_msg',
+      'No account found for this number.',
+      'error'
+    );
+  }
+
+  if(user.pass!==pass){
+    return setMsg(
+      'li_msg',
+      'Incorrect password.',
+      'error'
+    );
+  }
+
+  setSession(phone);
+
+  setMsg(
+    'li_msg',
+    'Signing in…',
+    'info'
+  );
+
+  setTimeout(()=>{
+
+    loadDashboard(user);
+
+    showScreen('dashScreen');
+
+  },300);
+}
+
+function showLogin(){
+  showScreen('loginScreen');
+}
+
+function logout(){
+
+  detailsVisible=false;
+
+  clearSession();
+
+  showScreen('loginScreen');
+}
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
+function loadDashboard(user){
+
+  if(!user)return;
+
+  $('d_name').textContent=
+    user.name;
+
+  $('d_acct').textContent=
+    user.phone;
+
+  cardFrozen=
+    user.frozen||false;
+
+  applyFreeze();
+
+  detailsVisible=false;
+
+  $('vcNum').textContent=
+    '•••• •••• •••• ••••';
+
+  $('vcHolder').textContent='—';
+
+  $('vcExpiry').textContent=
+    '••/••';
+
+  $('vcCVV').textContent=
+    '•••';
+
+  $('toggleBtn').innerHTML=`
+    <svg class="svg-icon">
+      <use href="#i-eye"></use>
+    </svg>
+    Show Details
+  `;
+
+  updateKYCBanner(user);
+
+  updateCardCenter();
+
+  refreshBal();
+}
+
+function refreshBal(){
+
+  const phone=
+    getSession();
+
+  if(!phone)return;
+
+  const user=
+    getUser(phone);
+
+  if(!user)return;
+
+  $('d_bal').textContent=
+    Number(user.balance)
+    .toLocaleString(
+      'en-NG',
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+  $('d_bal_time').textContent=
+    'Updated: '+
+    new Date()
+    .toLocaleTimeString('en-NG');
+
+  $('d_status').textContent=
+    cardFrozen
+    ? 'Card frozen'
+    : 'Balance refreshed';
+
+  updateCardCenter();
+}
+
+function updateKYCBanner(user){
+
+  const banner=
+    $('kycBanner');
+
+  if(user.kycVerified){
+
+    banner.className=
+      'kyc-banner verified';
+
+    $('kycIcon').innerHTML=`
+      <svg class="svg-icon">
+        <use href="#i-check"></use>
+      </svg>
+    `;
+
+    $('kycTitle').textContent=
+      'KYC Verified';
+
+    $('kycSub').textContent=
+      'Email: '+user.kycEmail;
+
+  }else{
+
+    banner.className=
+      'kyc-banner';
+
+    $('kycIcon').innerHTML=`
+      <svg class="svg-icon">
+        <use href="#i-shield"></use>
+      </svg>
+    `;
+
+    $('kycTitle').textContent=
+      'Complete KYC Verification';
+
+    $('kycSub').textContent=
+      'Verify your email to unlock higher limits';
+  }
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+
+function toggleCardDetails(){
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  if(!user)return;
+
+  detailsVisible=
+    !detailsVisible;
+
+  $('vcNum').textContent=
+    detailsVisible
+    ? user.card.number
+    : '•••• •••• •••• ••••';
+
+  $('vcHolder').textContent=
+    detailsVisible
+    ? user.name.toUpperCase()
+    : '—';
+
+  $('vcExpiry').textContent=
+    detailsVisible
+    ? user.card.expiry
+    : '••/••';
+
+  $('vcCVV').textContent=
+    detailsVisible
+    ? user.card.cvv
+    : '•••';
+
+  $('toggleBtn').innerHTML=
+    detailsVisible
+    ? `
+      <svg class="svg-icon">
+        <use href="#i-eye-off"></use>
+      </svg>
+      Hide Details
+    `
+    : `
+      <svg class="svg-icon">
+        <use href="#i-eye"></use>
+      </svg>
+      Show Details
+    `;
+
+  $('d_status').textContent=
+    detailsVisible
+    ? 'Keep screen private'
+    : 'Details hidden';
+}
+
+function toggleCardFromPanel(){
+
+  showScreen('dashScreen');
+
+  setTimeout(()=>{
+    toggleCardDetails();
+  },100);
+}
+
+function copyCardNum(){
+
+  if(!detailsVisible){
+
+    $('d_status').textContent=
+      'Show details first';
+
+    toast(
+      'Show card details first',
+      'info'
+    );
+
+    return;
+  }
+
+  const user=
+    getUser(getSession());
+
+  if(!user)return;
+
+  navigator.clipboard
+  .writeText(user.card.number)
+  .then(()=>{
+    toast(
+      'Card number copied',
+      'success'
+    );
+  });
+}
+
+function freezeCard(){
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  if(!user)return;
+
+  cardFrozen=
+    !cardFrozen;
+
+  user.frozen=
+    cardFrozen;
+
+  saveUser(user);
+
+  applyFreeze();
+
+  $('d_status').textContent=
+    cardFrozen
+    ? 'Card frozen — transactions disabled'
+    : 'Card active';
+
+  toast(
+    cardFrozen
+    ? 'Card frozen'
+    : 'Card unfrozen',
+    cardFrozen
+    ? 'info'
+    : 'success'
+  );
+
+  updateCardCenter();
+}
+
+function applyFreeze(){
+
+  const card=
+    $('virtualCard');
+
+  const badge=
+    $('vcBadge');
+
+  const btn=
+    $('freezeBtn');
+
+  if(!card || !badge || !btn)return;
+
+  if(cardFrozen){
+
+    card.classList.add(
+      'frozen-card'
+    );
+
+    badge.textContent=
+      '● FROZEN';
+
+    badge.className=
+      'vc-badge frz';
+
+    btn.innerHTML=`
+      <svg class="svg-icon">
+        <use href="#i-refresh"></use>
+      </svg>
+      Unfreeze
+    `;
+
+    btn.classList.remove(
+      'dang'
+    );
+
+  }else{
+
+    card.classList.remove(
+      'frozen-card'
+    );
+
+    badge.textContent=
+      '● ACTIVE';
+
+    badge.className=
+      'vc-badge act';
+
+    btn.innerHTML=`
+      <svg class="svg-icon">
+        <use href="#i-snow"></use>
+      </svg>
+      Freeze Card
+    `;
+
+    btn.classList.add(
+      'dang'
+    );
+  }
+
+  updateCardCenter();
+}
+
+function updateCardCenter(){
+
+  const status=
+    $('cardCenterStatus');
+
+  if(!status)return;
+
+  status.textContent=
+    cardFrozen
+    ? 'FROZEN'
+    : 'ACTIVE';
+
+  status.style.color=
+    cardFrozen
+    ? '#7fc7e8'
+    : 'var(--accent)';
+}
+
+/* =====================================================
+   COPY
+===================================================== */
+
+function copyText(txt,label){
+
+  navigator.clipboard
+  .writeText(txt)
+  .then(()=>{
+    toast(
+      label||'Copied!',
+      'success'
+    );
+  })
+  .catch(()=>{
+    toast(
+      'Copy unavailable',
+      'error'
+    );
+  });
+}
+
+/* =====================================================
+   PLATFORM SELECTION
+===================================================== */
+
+function selectPlatform(platform){
+
+  selectedPlatform=platform;
+
+  updatePlatformUI();
+
+  $('tr_acct').value='';
+  recipientPhone=null;
+  $('recipientFound').style.display='none';
+}
+
+function updatePlatformUI(){
+
+  document
+  .querySelectorAll('.platform-btn')
+  .forEach(btn=>{
+    btn.classList.remove('active');
+  });
+
+  const platformMap={
+    fedchain:0,
+    opay:1,
+    palmpay:2,
+    moniepoint:3,
+    kuda:4
+  };
+
+  const idx=platformMap[selectedPlatform];
+
+  if(idx!==undefined){
+    document
+    .querySelectorAll('.platform-btn')[idx]
+    .classList.add('active');
+  }
+
+  const label=$('recipientLabel');
+
+  const placeholders={
+    fedchain:'08012345678 (FedChain User)',
+    opay:'08012345678 (Opay Account)',
+    palmpay:'08012345678 (Palmpay Account)',
+    moniepoint:'08012345678 (Moniepoint Account)',
+    kuda:'08012345678 (Kuda Account)'
+  };
+
+  $('tr_acct').placeholder=
+    placeholders[selectedPlatform]||'Enter recipient account';
+}
+
+/* =====================================================
+   FEE DISPLAY
+===================================================== */
+
+function updateFeeDisplay(){
+
+  const amount=
+    Number($('tr_amount').value||0);
+
+  $('feeAmount').textContent=
+    fmtNGN(amount);
+
+  $('feeTotal').textContent=
+    fmtNGN(amount + TRANSACTION_FEE);
+}
+
+/* =====================================================
+   TRANSFER
+===================================================== */
+
+function lookupRecipient(val){
+
+  if(selectedPlatform!=='fedchain'){
+    $('recipientFound').style.display='none';
+    recipientPhone=null;
+    return;
+  }
+
+  const phone=
+    cleanPhone(val);
+
+  const el=
+    $('recipientFound');
+
+  recipientPhone=null;
+
+  if(
+    phone.length===11 &&
+    isNGPhone(phone)
+  ){
+
+    const target=
+      getUser(phone);
+
+    if(
+      target &&
+      phone!==getSession()
+    ){
+
+      recipientPhone=
+        phone;
+
+      $('rfName').textContent=
+        target.name;
+
+      $('rfNum').textContent=
+        phone;
+
+      el.style.display=
+        'block';
+
+    }else{
+
+      el.style.display=
+        'none';
+    }
+
+  }else{
+
+    el.style.display=
+      'none';
+  }
+}
+
+function doTransfer(){
+
+  if(cardFrozen){
+
+    return setMsg(
+      'tr_msg',
+      'Your card is frozen. Unfreeze to send money.',
+      'error'
+    );
+  }
+
+  const senderPhone=
+    getSession();
+
+  const sender=
+    getUser(senderPhone);
+
+  if(!sender)return;
+
+  const amount=
+    Number(
+      $('tr_amount').value
+    );
+
+  const note=
+    ($('tr_note').value||'')
+    .trim() ||
+    'Transfer';
+
+  const totalDebit=
+    amount + TRANSACTION_FEE;
+
+  if(
+    !amount ||
+    amount<10
+  ){
+
+    return setMsg(
+      'tr_msg',
+      'Minimum transfer amount is ₦10.',
+      'error'
+    );
+  }
+
+  if(totalDebit>sender.balance){
+
+    return setMsg(
+      'tr_msg',
+      'Insufficient balance (including ₦'+TRANSACTION_FEE+' fee).',
+      'error'
+    );
+  }
+
+  if(selectedPlatform==='fedchain'){
+
+    if(!recipientPhone){
+
+      return setMsg(
+        'tr_msg',
+        'Enter a valid registered FedChain account.',
+        'error'
+      );
+    }
+
+    if(recipientPhone===senderPhone){
+
+      return setMsg(
+        'tr_msg',
+        'Cannot transfer to yourself.',
+        'error'
+      );
+    }
+
+    const recipient=
+      getUser(recipientPhone);
+
+    if(!recipient){
+
+      return setMsg(
+        'tr_msg',
+        'Recipient not found.',
+        'error'
+      );
+    }
+
+    const reference=
+      txReference();
+
+    sender.balance -= totalDebit;
+
+    addTxDirect(
+      sender,
+      {
+        type:'debit',
+        icon:'debit',
+        title:'Transfer to '+recipient.name,
+        sub:note,
+        amount:-amount,
+        fee:TRANSACTION_FEE,
+        reference
+      }
+    );
+
+    saveUser(sender);
+
+    recipient.balance +=
+      amount;
+
+    addTxDirect(
+      recipient,
+      {
+        type:'credit',
+        icon:'credit',
+        title:'Transfer from '+sender.name,
+        sub:note,
+        amount:amount,
+        reference
+      }
+    );
+
+    saveUser(recipient);
+
+  }else{
+
+    /*
+       BACKEND INTEGRATION POINT:
+       For external platforms (Opay, Palmpay, Moniepoint, Kuda),
+       call their respective APIs here.
+
+       Example flow:
+       1. Validate account number format for the platform
+       2. Call platform API to verify recipient
+       3. Initiate transfer via platform API
+       4. Handle response and create transaction record
+       5. Update balance accordingly
+
+       Code structure:
+       const platformAPI = {
+         opay: {
+           validateAccount: (acct) => {...},
+           initTransfer: (acct, amount, ref) => {...}
+         },
+         palmpay: {...},
+         moniepoint: {...},
+         kuda: {...}
+       };
+
+       For demo, we simulate success
+    */
+
+    const reference=
+      txReference();
+
+    const recipientAcct=
+      $('tr_acct').value.trim();
+
+    sender.balance -= totalDebit;
+
+    const platformNames={
+      opay:'Opay',
+      palmpay:'Palmpay',
+      moniepoint:'Moniepoint',
+      kuda:'Kuda'
+    };
+
+    addTxDirect(
+      sender,
+      {
+        type:'debit',
+        icon:'debit',
+        title:'Transfer to '+platformNames[selectedPlatform],
+        sub:'Account: '+recipientAcct+' | '+note,
+        amount:-amount,
+        fee:TRANSACTION_FEE,
+        platform:selectedPlatform,
+        reference
+      }
+    );
+
+    saveUser(sender);
+  }
+
+  $('tr_acct').value='';
+  $('tr_amount').value='';
+  $('tr_note').value='';
+
+  $('recipientFound').style.display=
+    'none';
+
+  recipientPhone=null;
+
+  updateFeeDisplay();
+
+  refreshBal();
+
+  setMsg(
+    'tr_msg',
+    'Transfer successful!',
+    'success'
+  );
+
+  toast(
+    fmtNGN(amount)+
+    ' sent (fee: ₦'+TRANSACTION_FEE+')',
+    'success'
+  );
+}
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function getTxIcon(tx){
+
+  if(tx.icon==='credit'){
+
+    return `
+      <svg class="svg-icon"
+      style="color:var(--accent)">
+        <use href="#i-arrow-down"></use>
+      </svg>
+    `;
+
+  }
+
+  if(tx.icon==='debit'){
+
+    return `
+      <svg class="svg-icon"
+      style="color:var(--danger)">
+        <use href="#i-arrow-up"></use>
+      </svg>
+    `;
+
+  }
+
+  if(tx.icon==='ref'){
+
+    return `
+      <svg class="svg-icon"
+      style="color:var(--info)">
+        <use href="#i-gift"></use>
+      </svg>
+    `;
+
+  }
+
+  return `
+    <svg class="svg-icon"
+    style="color:var(--warn)">
+      <use href="#i-shield"></use>
+    </svg>
+  `;
+}
+
+function renderHistory(){
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  const list=
+    $('txList');
+
+  if(
+    !user ||
+    !user.history ||
+    user.history.length===0
+  ){
+
+    list.innerHTML=`
+
+      <div class="empty-state"
+      style="text-align:center;padding:45px 20px;color:var(--muted2);">
+
+        <svg class="svg-icon lg"
+        style="width:45px;height:45px;margin-bottom:12px;">
+          <use href="#i-history"></use>
+        </svg>
+
+        <p style="font-size:13px;">
+          No transactions yet.
+          <br>
+          Send or receive money to see history here.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+  }
+
+  list.innerHTML=
+    user.history.map(
+      (tx,index)=>{
+
+        const amount=
+          Number(tx.amount||0);
+
+        const cls=
+          amount>0
+          ? 'plus'
+          : amount<0
+          ? 'minus'
+          : '';
+
+        const iconClass=
+          tx.icon||tx.type||'ref';
+
+        const safeTitle=
+          escapeHTML(tx.title||'Transaction');
+
+        const safeSub=
+          escapeHTML(tx.sub||'');
+
+        return `
+
+        <div
+        class="tx-item"
+        onclick="openTransaction(${index})">
+
+          <div class="tx-icon ${iconClass}">
+            ${getTxIcon(tx)}
+          </div>
+
+          <div class="tx-body">
+
+            <div class="tx-title">
+              ${safeTitle}
+            </div>
+
+            <div class="tx-sub">
+              ${safeSub}
+            </div>
+
+          </div>
+
+          <div>
+
+            <div
+            class="tx-amt ${cls}">
+
+              ${
+                amount>0
+                ? '+ '
+                : amount<0
+                ? '- '
+                : ''
+              }
+
+              ${fmtNGN(Math.abs(amount))}
+
+            </div>
+
+            <div class="tx-date">
+              ${escapeHTML(tx.time||'')}
+            </div>
+
+          </div>
+
+          <div class="tx-arrow">
+
+            <svg class="svg-icon sm">
+              <use href="#i-chevron"></use>
+            </svg>
+
+          </div>
+
+        </div>
+
+        `;
+      }
+    ).join('');
+}
+
+/* =====================================================
+   TRANSACTION OVERVIEW
+===================================================== */
+
+function openTransaction(index){
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  if(
+    !user ||
+    !user.history ||
+    !user.history[index]
+  ){
+    return;
+  }
+
+  selectedTransaction=
+    user.history[index];
+
+  renderTransactionOverview(
+    selectedTransaction
+  );
+
+  showScreen(
+    'txOverviewPanel'
+  );
+}
+
+function renderTransactionOverview(tx){
+
+  const amount=
+    Number(tx.amount||0);
+
+  const icon=
+    $('overviewIcon');
+
+  const iconUse=
+    $('overviewIconUse');
+
+  icon.className=
+    'overview-icon '+
+    (tx.icon||tx.type||'ref');
+
+  if(tx.icon==='credit'){
+
+    iconUse.setAttribute(
+      'href',
+      '#i-arrow-down'
+    );
+
+  }else if(tx.icon==='debit'){
+
+    iconUse.setAttribute(
+      'href',
+      '#i-arrow-up'
+    );
+
+  }else if(tx.icon==='ref'){
+
+    iconUse.setAttribute(
+      'href',
+      '#i-gift'
+    );
+
+  }else{
+
+    iconUse.setAttribute(
+      'href',
+      '#i-shield'
+    );
+  }
+
+  $('overviewTitle').textContent=
+    tx.title||'Transaction';
+
+  $('overviewSub').textContent=
+    tx.sub||'Transaction completed';
+
+  const amountEl=
+    $('overviewAmount');
+
+  amountEl.textContent=
+    amount>0
+    ? '+ '+fmtNGN(amount)
+    : amount<0
+    ? '- '+fmtNGN(Math.abs(amount))
+    : fmtNGN(0);
+
+  amountEl.className=
+    'overview-amount '+
+    (
+      amount>0
+      ? 'plus'
+      : amount<0
+      ? 'minus'
+      : 'zero'
+    );
+
+  $('overviewStatus').textContent=
+    'Completed';
+
+  $('overviewDate').textContent=
+    tx.time||'—';
+
+  $('overviewDescription').textContent=
+    tx.sub||'—';
+
+  $('overviewType').textContent=
+    tx.type==='credit'
+    ? 'Credit'
+    : tx.type==='debit'
+    ? 'Debit'
+    : tx.type==='kyc'
+    ? 'Verification'
+    : 'Referral';
+
+  const reference=
+    tx.reference||
+    txReference();
+
+  $('overviewReference').textContent=
+    reference;
+
+  $('overviewReferenceBox').textContent=
+    reference;
+}
+
+/* =====================================================
+   REFER
+===================================================== */
+
+function renderRefer(){
+
+  const user=
+    getUser(getSession());
+
+  if(!user)return;
+
+  $('refCode').textContent=
+    user.refCode||'—';
+
+  $('refCount').textContent=
+    user.referralCount||0;
+
+  $('refEarned').textContent=
+    fmtNGN(
+      user.referralEarned||0
+    );
+}
+
+function copyRefCode(){
+
+  const code=
+    $('refCode').textContent;
+
+  copyText(
+    code,
+    'Referral code copied!'
+  );
+}
+
+function shareRef(){
+
+  const user=
+    getUser(getSession());
+
+  if(!user)return;
+
+  const msg=
+    `Join FedChain and get ₦${INITIAL_BAL.toLocaleString()} free! Use my code: ${user.refCode}`;
+
+  if(navigator.share){
+
+    navigator.share({
+      title:'FedChain Referral',
+      text:msg
+    }).catch(()=>{});
+
+  }else{
+
+    copyText(
+      msg,
+      'Referral message copied!'
+    );
+  }
+
+  setMsg(
+    'ref_msg',
+    'Referral message ready to share!',
+    'success'
+  );
+}
+
+/* =====================================================
+   KYC
+===================================================== */
+
+function renderKYC(){
+
+  const user=
+    getUser(getSession());
+
+  if(!user)return;
+
+  if(user.kycVerified){
+
+    ['kycStep1','kycStep2']
+    .forEach(
+      s=>$(s).classList.remove('active')
+    );
+
+    $('kycStep3')
+      .classList.add('active');
+
+  }else{
+
+    $('kycStep3')
+      .classList.remove('active');
+
+    $('kycStep2')
+      .classList.remove('active');
+
+    $('kycStep1')
+      .classList.add('active');
+
+    if(user.kycEmail){
+      $('kyc_email').value=
+        user.kycEmail;
+    }
+  }
+}
+
+function sendEmailOTP(resend=false){
+
+  const email=
+    ($('kyc_email').value||'')
+    .trim();
+
+  if(
+    !email ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ){
+
+    return setMsg(
+      'kyc_msg1',
+      'Enter a valid email address.',
+      'error'
+    );
+  }
+
+  /* 
+     BACKEND INTEGRATION POINT:
+     Call your Email API here (SendGrid, Mailgun, etc.)
+     Example: await sendEmailOTP(email, generatedOTP)
+     For demo, we generate locally
+  */
+
+  pendingEmailOTP=
+    genOTP();
+
+  $('kyc_email_show').textContent=
+    email;
+
+  $('demo_email_code').textContent=
+    pendingEmailOTP;
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  if(user){
+
+    user.kycEmail=
+      email;
+
+    saveUser(user);
+  }
+
+  clearOTP('e');
+
+  $('kycStep1')
+    .classList.remove('active');
+
+  $('kycStep2')
+    .classList.add('active');
+
+  setTimeout(()=>{
+    $('e0').focus();
+  },200);
+
+  toast(
+    'OTP sent to '+email,
+    'info'
+  );
+
+  if(resend){
+
+    setMsg(
+      'kyc_msg2',
+      'New OTP: '+pendingEmailOTP+' (check email)',
+      'success'
+    );
+  }
+}
+
+function verifyEmailOTP(){
+
+  const entered=
+    getOTPVal('e');
+
+  if(entered.length<6){
+
+    return setMsg(
+      'kyc_msg2',
+      'Enter all 6 digits.',
+      'error'
+    );
+  }
+
+  if(entered!==pendingEmailOTP){
+
+    return setMsg(
+      'kyc_msg2',
+      'Incorrect OTP. Try again.',
+      'error'
+    );
+  }
+
+  const phone=
+    getSession();
+
+  const user=
+    getUser(phone);
+
+  if(!user)return;
+
+  user.kycVerified=
+    true;
+
+  user.kycEmail=
+    $('kyc_email_show').textContent;
+
+  addTxDirect(
+    user,
+    {
+      type:'kyc',
+      icon:'kyc',
+      title:'KYC Verified',
+      sub:'Email: '+user.kycEmail,
+      amount:0
+    }
+  );
+
+  saveUser(user);
+
+  $('kycStep2')
+    .classList.remove('active');
+
+  $('kycStep3')
+    .classList.add('active');
+
+  updateKYCBanner(user);
+
+  toast(
+    'Identity verified!',
+    'success'
+  );
+}
+
+/* =====================================================
+   AUTO RESUME
+===================================================== */
+
+(function init(){
+
+  const phone=
+    getSession();
+
+  if(phone){
+
+    const user=
+      getUser(phone);
+
+    if(user){
+
+      loadDashboard(user);
+
+      showScreen(
+        'dashScreen'
+      );
+
+      return;
+    }
+  }
+
+  showScreen(
+    'signupScreen'
+  );
+
+})();
+
+</script>
+
+</body>
+</html>
