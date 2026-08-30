@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VaultNG — Virtual Card</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#06131f;
+  --surface:#0b202e;
+  --surface2:#0d2535;
+  --border:#193b4d;
+  --border2:#1f4d62;
+  --accent:#00bd82;
+  --accent2:#087b61;
+  --muted:#8da4b2;
+  --muted2:#5f7f90;
+  --danger:#e05252;
+  --text:#fff;
+  --radius:17px;
+  --radius-sm:11px;
+}
+
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Arial,Helvetica,sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:28px 18px 40px;
+}
+
+.app{
+  width:100%;
+  max-width:430px;
+}
+
+/* ──────────────── SCREENS ──────────────── */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ──────────────── LOGO ──────────────── */
+.logo{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:28px;
+}
+.logo-icon{
+  width:38px;height:38px;
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  box-shadow:0 4px 14px rgba(0,189,130,.3);
+}
+.logo-text{font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;font-weight:600;}
+
+/* ──────────────── AUTH CARD ──────────────── */
+.auth-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:26px 22px;
+  margin-bottom:20px;
+}
+.auth-card h2{
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+.auth-card .sub{
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:22px;
+  line-height:1.5;
+}
+
+/* ──────────────── FORM FIELDS ──────────────── */
+.field{margin-bottom:14px;}
+.field label{
+  display:block;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--muted);
+  margin-bottom:7px;
+  text-transform:uppercase;
+}
+.field input{
+  width:100%;
+  padding:13px 15px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border2);
+  background:#071924;
+  color:#fff;
+  outline:none;
+  font-size:14px;
+  transition:border-color .2s;
+}
+.field input:focus{border-color:var(--accent);}
+.field input::placeholder{color:var(--muted2);}
+
+/* phone row */
+.phone-row{display:flex;gap:8px;}
+.flag-prefix{
+  display:flex;align-items:center;gap:6px;
+  background:#071924;
+  border:1px solid var(--border2);
+  border-radius:var(--radius-sm);
+  padding:0 13px;
+  font-size:14px;
+  white-space:nowrap;
+  color:var(--muted);
+  font-weight:600;
+}
+.flag-prefix span.flag{font-size:18px;}
+.phone-row .field{flex:1;margin-bottom:0;}
+
+/* OTP row */
+.otp-row{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:4px;
+}
+.otp-row input{
+  width:46px;height:52px;
+  border-radius:10px;
+  border:1px solid var(--border2);
+  background:#071924;
+  color:#fff;
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+  outline:none;
+  caret-color:var(--accent);
+  transition:border-color .2s;
+}
+.otp-row input:focus{border-color:var(--accent);}
+
+/* ──────────────── BUTTONS ──────────────── */
+.btn{
+  width:100%;
+  border:none;
+  border-radius:var(--radius-sm);
+  padding:14px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  letter-spacing:.3px;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;
+  box-shadow:0 4px 16px rgba(0,189,130,.25);
+}
+.btn-primary:hover{
+  background:linear-gradient(135deg,#00d695,#098c6d);
+}
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--muted);
+}
+.btn-ghost:hover{background:var(--surface2);}
+
+.btn-sm{
+  width:auto;padding:9px 16px;font-size:12px;
+}
+
+/* ──────────────── STATUS / MSG ──────────────── */
+.msg{
+  font-size:12px;
+  margin-top:12px;
+  text-align:center;
+  min-height:18px;
+}
+.msg.error{color:#e05252;}
+.msg.success{color:var(--accent);}
+.msg.info{color:var(--muted);}
+
+.link-row{
+  text-align:center;
+  margin-top:18px;
+  font-size:13px;
+  color:var(--muted);
+}
+.link-row a{
+  color:var(--accent);
+  cursor:pointer;
+  font-weight:600;
+  text-decoration:none;
+}
+.link-row a:hover{text-decoration:underline;}
+
+/* ──────────────── OTP HINT BOX ──────────────── */
+.otp-hint{
+  background:rgba(0,189,130,.08);
+  border:1px solid rgba(0,189,130,.2);
+  border-radius:10px;
+  padding:11px 14px;
+  font-size:12px;
+  color:var(--accent);
+  margin-bottom:18px;
+  line-height:1.5;
+}
+.otp-phone{font-weight:700;color:#fff;}
+.resend-row{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:10px;
+}
+.resend-row a{color:var(--accent);cursor:pointer;}
+
+/* ──────────────── DASHBOARD ──────────────── */
+#dashScreen .header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+#dashScreen .header .user-info{}
+#dashScreen .header .user-info .greet{
+  font-size:12px;color:var(--muted);margin-bottom:2px;
+}
+#dashScreen .header .user-info .name{
+  font-size:18px;font-weight:700;
+}
+
+.logout-btn{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:var(--muted);
+  transition:.2s;
+  font-size:18px;
+}
+.logout-btn:hover{
+  background:#1a3245;
+  border-color:var(--danger);
+  color:var(--danger);
+}
+
+/* ACCOUNT NUMBER PILL */
+.acct-pill{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:13px 18px;
+  margin-bottom:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.acct-pill .acct-label{
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:1px;
+  font-weight:700;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.acct-pill .acct-num{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:2px;
+  font-family:monospace;
+}
+.copy-acct{
+  background:rgba(0,189,130,.1);
+  border:1px solid rgba(0,189,130,.2);
+  color:var(--accent);
+  border-radius:8px;
+  padding:6px 12px;
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+.copy-acct:hover{background:rgba(0,189,130,.2);}
+
+/* BALANCE BOX */
+.balance-box{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 20px 16px;
+  margin-bottom:20px;
+}
+.balance-label{color:var(--muted);font-size:12px;margin-bottom:6px;letter-spacing:.5px;}
+.balance{font-size:32px;font-weight:800;letter-spacing:-.5px;}
+.balance .currency{font-size:18px;font-weight:600;color:var(--muted);margin-right:3px;}
+.balance-sub{color:var(--muted2);font-size:11px;margin-top:5px;}
+
+/* ──────────────── VIRTUAL CARD ──────────────── */
+.virtual-card{
+  position:relative;
+  width:100%;
+  aspect-ratio:1.586;
+  border-radius:22px;
+  padding:24px;
+  overflow:hidden;
+  background:linear-gradient(135deg,#102b3b 0%,#123e4d 45%,#061923 100%);
+  box-shadow:0 22px 45px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.15);
+  transition:.35s;
+  margin-bottom:18px;
+}
+.virtual-card::before{
+  content:"";position:absolute;width:260px;height:260px;
+  border-radius:50%;background:rgba(0,255,180,.08);right:-100px;top:-120px;
+}
+.virtual-card::after{
+  content:"";position:absolute;width:220px;height:220px;
+  border-radius:50%;background:rgba(0,150,255,.07);left:-100px;bottom:-120px;
+}
+.card-top,.chip,.card-number,.card-info,.card-network{position:relative;z-index:2;}
+
+.card-top{display:flex;justify-content:space-between;align-items:center;}
+.card-type{font-size:11px;letter-spacing:2.5px;color:#d3e0e7;font-weight:600;}
+.contactless{font-size:22px;transform:rotate(90deg);color:#d6e3e8;line-height:1;}
+
+.chip{
+  width:45px;height:34px;border-radius:7px;margin-top:22px;
+  background:linear-gradient(135deg,#eee,#999,#ddd);
+  position:relative;
+}
+.chip::before{content:"";position:absolute;width:100%;height:1px;background:#777;top:50%;}
+.chip::after{content:"";position:absolute;height:100%;width:1px;background:#777;left:50%;}
+
+.card-number{
+  margin-top:18px;
+  font-family:'Courier New',monospace;
+  font-size:18px;
+  letter-spacing:3px;
+  font-weight:600;
+}
+
+.card-info{
+  position:absolute;left:24px;bottom:23px;
+  display:flex;gap:22px;
+}
+.info-label{
+  font-size:8px;color:#8da6b4;letter-spacing:1.5px;
+  margin-bottom:4px;font-weight:600;text-transform:uppercase;
+}
+.info-value{font-size:11px;letter-spacing:1px;font-weight:600;}
+
+.card-network{
+  position:absolute;right:23px;bottom:18px;
+  font-size:27px;font-weight:900;font-style:italic;letter-spacing:-2px;
+}
+
+.card-status-badge{
+  position:absolute;top:18px;right:20px;z-index:5;
+  background:rgba(0,0,0,.3);padding:5px 10px;
+  border-radius:20px;font-size:9px;letter-spacing:1px;font-weight:700;
+}
+.card-status-badge.frozen{color:#7fc7e8;}
+.card-status-badge.active{color:#00e897;}
+
+/* ──────────────── ACTION BUTTONS ──────────────── */
+.action-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+.action-btn{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:14px 10px;
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.action-btn:hover{background:#12384b;border-color:var(--border2);}
+.action-btn .icon{font-size:20px;}
+.action-btn.primary-action{
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;
+  box-shadow:0 4px 14px rgba(0,189,130,.22);
+}
+.action-btn.primary-action:hover{
+  background:linear-gradient(135deg,#00d695,#098c6d);
+}
+.action-btn.danger-action{
+  border-color:rgba(224,82,82,.3);
+  color:#e8a0a0;
+}
+.action-btn.danger-action:hover{
+  background:rgba(224,82,82,.08);
+  border-color:rgba(224,82,82,.5);
+}
+
+.dash-status{
+  text-align:center;color:var(--muted2);font-size:12px;
+  margin-top:4px;min-height:18px;
+}
+
+/* ──────────────── FROZEN ──────────────── */
+.frozen-card{opacity:.5;filter:grayscale(.8);}
+
+/* ──────────────── UTILITY ──────────────── */
+.hidden{display:none!important;}
+
+@media(max-width:380px){
+  .virtual-card{padding:18px;}
+  .card-number{font-size:15px;letter-spacing:2px;}
+  .card-info{left:18px;bottom:18px;gap:16px;}
+  .card-network{right:18px;bottom:14px;font-size:23px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══════════════ SIGN UP SCREEN ═══════════════ -->
+  <div id="signupScreen" class="screen active">
+
+    <div class="logo">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div class="logo-text">VaultNG</div>
+        <div class="logo-sub">VIRTUAL CARD</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <h2>Create Account</h2>
+      <p class="sub">Open your free virtual debit card in minutes.</p>
+
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="su_name" placeholder="e.g. Chukwuemeka Okafor" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label>Nigerian Phone Number</label>
+        <div class="phone-row">
+          <div class="flag-prefix"><span class="flag">🇳🇬</span> +234</div>
+          <div class="field">
+            <input type="tel" id="su_phone" placeholder="080XXXXXXXX" maxlength="11" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="su_pass" placeholder="Min. 6 characters">
+      </div>
+
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" id="su_pass2" placeholder="Repeat password">
+      </div>
+
+      <div style="margin-top:6px;">
+        <button class="btn btn-primary" onclick="requestOTP()">Send OTP & Continue</button>
+      </div>
+
+      <div class="msg info" id="su_msg"></div>
+    </div>
+
+    <div class="link-row">Already have an account? <a onclick="showLogin()">Sign In</a></div>
+  </div>
+
+  <!-- ═══════════════ OTP SCREEN ═══════════════ -->
+  <div id="otpScreen" class="screen">
+
+    <div class="logo">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div class="logo-text">VaultNG</div>
+        <div class="logo-sub">VERIFY PHONE</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <h2>Enter OTP</h2>
+      <p class="sub">Enter the 6-digit code sent to your number.</p>
+
+      <div class="otp-hint">
+        📱 Demo OTP sent to <span class="otp-phone" id="otp_phone_display"></span><br>
+        <strong style="font-size:13px;color:#fff;">Your demo OTP code is: <span id="demo_otp_reveal" style="color:var(--accent);letter-spacing:3px;"></span></strong>
+      </div>
+
+      <div class="otp-row">
+        <input type="text" maxlength="1" class="otp-input" id="otp0" oninput="otpNext(this,0)">
+        <input type="text" maxlength="1" class="otp-input" id="otp1" oninput="otpNext(this,1)">
+        <input type="text" maxlength="1" class="otp-input" id="otp2" oninput="otpNext(this,2)">
+        <input type="text" maxlength="1" class="otp-input" id="otp3" oninput="otpNext(this,3)">
+        <input type="text" maxlength="1" class="otp-input" id="otp4" oninput="otpNext(this,4)">
+        <input type="text" maxlength="1" class="otp-input" id="otp5" oninput="otpNext(this,5)">
+      </div>
+
+      <div class="resend-row">Didn't get it? <a onclick="resendOTP()">Resend OTP</a></div>
+
+      <div style="margin-top:18px;">
+        <button class="btn btn-primary" onclick="verifyOTP()">Verify & Create Account</button>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button class="btn btn-ghost" onclick="backToSignup()">← Back</button>
+      </div>
+
+      <div class="msg info" id="otp_msg"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+  <div id="loginScreen" class="screen">
+
+    <div class="logo">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div class="logo-text">VaultNG</div>
+        <div class="logo-sub">VIRTUAL CARD</div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <h2>Welcome Back</h2>
+      <p class="sub">Sign in with your registered phone number.</p>
+
+      <div class="field">
+        <label>Phone Number</label>
+        <div class="phone-row">
+          <div class="flag-prefix"><span class="flag">🇳🇬</span> +234</div>
+          <div class="field">
+            <input type="tel" id="li_phone" placeholder="080XXXXXXXX" maxlength="11">
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="li_pass" placeholder="Your password">
+      </div>
+
+      <div style="margin-top:6px;">
+        <button class="btn btn-primary" onclick="login()">Sign In</button>
+      </div>
+
+      <div class="msg info" id="li_msg"></div>
+    </div>
+
+    <div class="link-row">Don't have an account? <a onclick="showSignup()">Create Account</a></div>
+  </div>
+
+  <!-- ═══════════════ DASHBOARD SCREEN ═══════════════ -->
+  <div id="dashScreen" class="screen">
+
+    <div class="header">
+      <div class="user-info">
+        <div class="greet">Good day 👋</div>
+        <div class="name" id="dash_name">—</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">⏏</button>
+    </div>
+
+    <!-- ACCOUNT NUMBER -->
+    <div class="acct-pill">
+      <div>
+        <div class="acct-label">Account Number</div>
+        <div class="acct-num" id="dash_acct">—</div>
+      </div>
+      <button class="copy-acct" onclick="copyAcctNum()">Copy</button>
+    </div>
+
+    <!-- BALANCE -->
+    <div class="balance-box">
+      <div class="balance-label">AVAILABLE BALANCE</div>
+      <div class="balance"><span class="currency">₦</span><span id="dash_balance">0.00</span></div>
+      <div class="balance-sub" id="balance_updated">—</div>
+    </div>
+
+    <!-- VIRTUAL CARD -->
+    <div class="virtual-card" id="virtualCard">
+
+      <div class="card-status-badge active" id="cardStatusBadge">● ACTIVE</div>
+
+      <div class="card-top">
+        <div class="card-type">VIRTUAL DEBIT</div>
+        <div class="contactless">)))</div>
+      </div>
+
+      <div class="chip"></div>
+
+      <div class="card-number" id="cardNumber">•••• •••• •••• ••••</div>
+
+      <div class="card-info">
+        <div>
+          <div class="info-label">Card Holder</div>
+          <div class="info-value" id="cardHolder">—</div>
+        </div>
+        <div>
+          <div class="info-label">Expires</div>
+          <div class="info-value" id="cardExpiry">••/••</div>
+        </div>
+        <div>
+          <div class="info-label">CVV</div>
+          <div class="info-value" id="cardCVV">•••</div>
+        </div>
+      </div>
+
+      <div class="card-network">VISA</div>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="action-grid">
+
+      <button class="action-btn primary-action" onclick="toggleDetails()" id="toggleBtn">
+        <span class="icon">👁</span> Show Details
+      </button>
+
+      <button class="action-btn" onclick="copyCardNumber()">
+        <span class="icon">📋</span> Copy Number
+      </button>
+
+      <button class="action-btn danger-action" onclick="freezeCard()" id="freezeBtn">
+        <span class="icon">🧊</span> Freeze Card
+      </button>
+
+      <button class="action-btn" onclick="refreshBalance()">
+        <span class="icon">🔄</span> Refresh Balance
+      </button>
+
+    </div>
+
+    <div class="dash-status" id="dash_status">—</div>
+
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONSTANTS & STATE
+═══════════════════════════════════════════ */
+const INITIAL_BALANCE = 50000; // NGN demo balance
+let pendingOTP   = null;
+let pendingData  = {};
+let detailsVisible = false;
+let cardFrozen   = false;
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function show(id){ document.getElementById(id).classList.add('active'); }
+function hide(id){ document.getElementById(id).classList.remove('active'); }
+function showScreen(id){
+  ['signupScreen','otpScreen','loginScreen','dashScreen']
+    .forEach(s => {
+      s === id ? show(s) : hide(s);
+    });
+}
+function setMsg(id, text, type='info'){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+function formatNGN(val){
+  return Number(val).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function cleanPhone(raw){
+  // strip spaces/dashes, ensure 11 digits starting with 0
+  return raw.replace(/\D/g,'');
+}
+function isValidNGPhone(num){
+  // 11 digits, starts with 07, 08, or 09
+  return /^0[789]\d{9}$/.test(num);
+}
+function generateOTP(){
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+function generateCardDetails(name, phone){
+  // deterministic-ish card from phone seed but randomised each sign-up
+  const last4 = phone.slice(-4);
+  const rand4 = () => Math.floor(1000 + Math.random()*9000);
+  const number = `4${rand4()} ${rand4()} ${rand4()} ${last4}`;
+  const cvv    = String(Math.floor(100 + Math.random()*900));
+  const now    = new Date();
+  const expM   = String(now.getMonth()+1).padStart(2,'0');
+  const expY   = String(now.getFullYear() + 4).slice(-2);
+  const expiry = `${expM}/${expY}`;
+  return { number, cvv, expiry };
+}
+
+/* ═══════════════════════════════════════════
+   SIGN UP FLOW
+═══════════════════════════════════════════ */
+function requestOTP(){
+  const name   = document.getElementById('su_name').value.trim();
+  const phone  = cleanPhone(document.getElementById('su_phone').value.trim());
+  const pass   = document.getElementById('su_pass').value;
+  const pass2  = document.getElementById('su_pass2').value;
+
+  if(!name){ return setMsg('su_msg','Please enter your full name.','error'); }
+  if(name.split(' ').filter(Boolean).length < 2){
+    return setMsg('su_msg','Please enter both first and last name.','error');
+  }
+  if(!isValidNGPhone(phone)){
+    return setMsg('su_msg','Enter a valid Nigerian phone number (e.g. 08012345678).','error');
+  }
+  if(pass.length < 6){ return setMsg('su_msg','Password must be at least 6 characters.','error'); }
+  if(pass !== pass2){ return setMsg('su_msg','Passwords do not match.','error'); }
+
+  // check if phone already registered
+  const existing = localStorage.getItem('vng_user_' + phone);
+  if(existing){ return setMsg('su_msg','This number is already registered. Please sign in.','error'); }
+
+  // generate & "send" OTP
+  pendingOTP  = generateOTP();
+  pendingData = { name, phone, pass };
+
+  // populate OTP screen
+  document.getElementById('otp_phone_display').textContent = '+234 ' + phone.slice(1);
+  document.getElementById('demo_otp_reveal').textContent   = pendingOTP;
+
+  // clear OTP inputs
+  for(let i=0;i<6;i++) document.getElementById('otp'+i).value = '';
+
+  setMsg('su_msg','','info');
+  showScreen('otpScreen');
+  document.getElementById('otp0').focus();
+}
+
+function otpNext(el, idx){
+  el.value = el.value.replace(/\D/,'');
+  if(el.value && idx < 5) document.getElementById('otp'+(idx+1)).focus();
+}
+
+function getOTPValue(){
+  let code = '';
+  for(let i=0;i<6;i++) code += document.getElementById('otp'+i).value;
+  return code;
+}
+
+function verifyOTP(){
+  const entered = getOTPValue();
+  if(entered.length < 6){ return setMsg('otp_msg','Please enter all 6 digits.','error'); }
+  if(entered !== pendingOTP){ return setMsg('otp_msg','Incorrect OTP. Try again.','error'); }
+
+  // create account
+  const { name, phone, pass } = pendingData;
+  const card = generateCardDetails(name, phone);
+  const userData = {
+    name,
+    phone,
+    pass,       // NOTE: demo only – never store plain passwords in real apps
+    card,
+    balance: INITIAL_BALANCE,
+    frozen: false,
+    created: Date.now()
+  };
+  localStorage.setItem('vng_user_' + phone, JSON.stringify(userData));
+  localStorage.setItem('vng_session', phone);
+
+  setMsg('otp_msg','Account created!','success');
+  setTimeout(()=>{ loadDashboard(userData); showScreen('dashScreen'); }, 500);
+}
+
+function resendOTP(){
+  pendingOTP = generateOTP();
+  document.getElementById('demo_otp_reveal').textContent = pendingOTP;
+  for(let i=0;i<6;i++) document.getElementById('otp'+i).value='';
+  setMsg('otp_msg','New OTP generated (see box above).','success');
+  document.getElementById('otp0').focus();
+}
+
+function backToSignup(){ showScreen('signupScreen'); }
+
+/* ═══════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════ */
+function login(){
+  const phone = cleanPhone(document.getElementById('li_phone').value.trim());
+  const pass  = document.getElementById('li_pass').value;
+
+  if(!isValidNGPhone(phone)){
+    return setMsg('li_msg','Enter a valid Nigerian phone number.','error');
+  }
+
+  const raw = localStorage.getItem('vng_user_' + phone);
+  if(!raw){ return setMsg('li_msg','No account found for this number.','error'); }
+
+  const userData = JSON.parse(raw);
+  if(userData.pass !== pass){ return setMsg('li_msg','Incorrect password.','error'); }
+
+  localStorage.setItem('vng_session', phone);
+  setMsg('li_msg','Signing in…','info');
+  setTimeout(()=>{ loadDashboard(userData); showScreen('dashScreen'); }, 300);
+}
+
+function showLogin()  { setMsg('su_msg','','info'); showScreen('loginScreen'); }
+function showSignup() { setMsg('li_msg','','info'); showScreen('signupScreen'); }
+
+/* ═══════════════════════════════════════════
+   LOGOUT
+═══════════════════════════════════════════ */
+function logout(){
+  detailsVisible = false;
+  cardFrozen     = false;
+  localStorage.removeItem('vng_session');
+  showScreen('loginScreen');
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+function loadDashboard(userData){
+  // personalise
+  const firstName = userData.name.split(' ')[0];
+  document.getElementById('dash_name').textContent = userData.name;
+  document.getElementById('dash_acct').textContent = userData.phone; // phone = account number
+
+  // restore freeze state
+  cardFrozen = userData.frozen || false;
+  applyFreezeState();
+
+  // card display
+  detailsVisible = false;
+  document.getElementById('cardNumber').textContent  = '•••• •••• •••• ••••';
+  document.getElementById('cardHolder').textContent  = '—';
+  document.getElementById('cardExpiry').textContent  = '••/••';
+  document.getElementById('cardCVV').textContent     = '•••';
+  document.getElementById('toggleBtn').innerHTML     = '<span class="icon">👁</span> Show Details';
+
+  // balance
+  refreshBalance();
+}
+
+function getUserData(){
+  const phone = localStorage.getItem('vng_session');
+  if(!phone) return null;
+  const raw = localStorage.getItem('vng_user_' + phone);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function saveUserData(data){
+  localStorage.setItem('vng_user_' + data.phone, JSON.stringify(data));
+}
+
+function refreshBalance(){
+  document.getElementById('dash_status').textContent = 'Fetching balance…';
+  setTimeout(()=>{
+    const userData = getUserData();
+    if(!userData) return;
+    document.getElementById('dash_balance').textContent = formatNGN(userData.balance);
+    const now = new Date();
+    document.getElementById('balance_updated').textContent =
+      'Last updated: ' + now.toLocaleTimeString('en-NG');
+    document.getElementById('dash_status').textContent =
+      cardFrozen ? 'Card frozen — balance refreshed' : 'Balance refreshed';
+  }, 350);
+}
+
+/* ═══════════════════════════════════════════
+   CARD CONTROLS
+═══════════════════════════════════════════ */
+function toggleDetails(){
+  detailsVisible = !detailsVisible;
+  const userData = getUserData();
+  if(!userData) return;
+  const card = userData.card;
+  const name = userData.name.toUpperCase();
+
+  document.getElementById('cardNumber').textContent =
+    detailsVisible ? card.number : '•••• •••• •••• ••••';
+  document.getElementById('cardHolder').textContent =
+    detailsVisible ? name : '—';
+  document.getElementById('cardExpiry').textContent =
+    detailsVisible ? card.expiry : '••/••';
+  document.getElementById('cardCVV').textContent =
+    detailsVisible ? card.cvv : '•••';
+
+  document.getElementById('toggleBtn').innerHTML =
+    detailsVisible
+      ? '<span class="icon">🙈</span> Hide Details'
+      : '<span class="icon">👁</span> Show Details';
+
+  document.getElementById('dash_status').textContent =
+    detailsVisible ? 'Details revealed — keep screen private' : 'Details hidden';
+}
+
+function copyCardNumber(){
+  if(!detailsVisible){
+    document.getElementById('dash_status').textContent = 'Show details first to copy number';
+    return;
+  }
+  const userData = getUserData();
+  if(!userData) return;
+  navigator.clipboard.writeText(userData.card.number).then(()=>{
+    document.getElementById('dash_status').textContent = 'Card number copied to clipboard';
+    setTimeout(()=>{
+      document.getElementById('dash_status').textContent =
+        cardFrozen ? 'Card frozen' : 'Card active';
+    }, 2000);
+  });
+}
+
+function copyAcctNum(){
+  const num = document.getElementById('dash_acct').textContent;
+  navigator.clipboard.writeText(num).then(()=>{
+    document.getElementById('dash_status').textContent = 'Account number copied';
+    setTimeout(()=>{
+      document.getElementById('dash_status').textContent = '';
+    }, 2000);
+  });
+}
+
+function freezeCard(){
+  cardFrozen = !cardFrozen;
+  const userData = getUserData();
+  if(!userData) return;
+  userData.frozen = cardFrozen;
+  saveUserData(userData);
+  applyFreezeState();
+  document.getElementById('dash_status').textContent =
+    cardFrozen ? 'Card frozen — transactions disabled' : 'Card unfrozen — card active';
+}
+
+function applyFreezeState(){
+  const card   = document.getElementById('virtualCard');
+  const badge  = document.getElementById('cardStatusBadge');
+  const btn    = document.getElementById('freezeBtn');
+
+  if(cardFrozen){
+    card.classList.add('frozen-card');
+    badge.textContent = '● FROZEN';
+    badge.className   = 'card-status-badge frozen';
+    btn.innerHTML     = '<span class="icon">🔥</span> Unfreeze';
+  } else {
+    card.classList.remove('frozen-card');
+    badge.textContent = '● ACTIVE';
+    badge.className   = 'card-status-badge active';
+    btn.innerHTML     = '<span class="icon">🧊</span> Freeze Card';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   AUTO-RESUME SESSION
+═══════════════════════════════════════════ */
+(function init(){
+  const phone = localStorage.getItem('vng_session');
+  if(phone){
+    const raw = localStorage.getItem('vng_user_' + phone);
+    if(raw){
+      const userData = JSON.parse(raw);
+      loadDashboard(userData);
+      showScreen('dashScreen');
+      return;
+    }
+  }
+  showScreen('signupScreen');
+})();
+
+/* ═══════════════════════════════════════════
+   CONSOLE HELPER — setBalance(amount)
+═══════════════════════════════════════════ */
+function setBalance(amount){
+  const v = Number(amount);
+  if(!Number.isFinite(v) || v < 0) return console.warn('Invalid amount');
+  const userData = getUserData();
+  if(!userData) return console.warn('Not signed in');
+  userData.balance = v;
+  saveUserData(userData);
+  refreshBalance();
+}
+</script>
+</body>
+</html>
